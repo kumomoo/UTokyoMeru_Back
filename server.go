@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/router"
+	"backend/internal/router"
 	"fmt"
 	"net/http"
 

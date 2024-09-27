@@ -2,6 +2,7 @@ package db
 
 import (
 	"sync"
+	"backend/config"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ var (
 
 func GetDatabaseInstance() (*gorm.DB, error) {
 	dbOnce.Do(func() {
-		dsn := "Meru.db" // SQLite 数据库文件名
+		dsn := config.C.ToDSN()
 		dbInstance, dbErr = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	})
 	return dbInstance, dbErr
