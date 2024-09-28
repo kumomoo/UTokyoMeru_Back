@@ -7,7 +7,11 @@ import (
 	"github.com/zeromicro/go-zero/core/conf"
 )
 
-type dbConfig struct {
+type Config struct {
+	DbConfig DbConfig
+}
+
+type DbConfig struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
 	User     string `json:"user"`
@@ -17,15 +21,17 @@ type dbConfig struct {
 	Timezone string `json:"timezone"`
 }
 
-var C dbConfig
+var C Config
 
 func init() {
-	var f = flag.String("f", "UTokyoMeru_Back/dbconfig.yaml", "config file")
+	var f = flag.String("f", "config.yaml", "config file")
 	flag.Parse()
 	conf.MustLoad(*f, &C)
 }
 
-func (c *dbConfig) ToDSN() string {
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-		c.Host, c.User, c.Password, c.Dbname, c.Port, c.SSLMode, c.Timezone)
+func (c *Config) ToDSN() string {
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+		c.DbConfig.Host, c.DbConfig.User, c.DbConfig.Password, c.DbConfig.Dbname, c.DbConfig.Port, c.DbConfig.SSLMode, c.DbConfig.Timezone)
+	fmt.Println("database config loaded:", dsn)
+	return dsn
 }

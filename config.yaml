@@ -1,0 +1,8 @@
+dbConfig:
+  host: localhost
+  port: "5433"
+  user: yamanashi
+  password: yamanashi@412907
+  dbname: postgres
+  sslmode: disable
+  timezone: Asia/Tokyo

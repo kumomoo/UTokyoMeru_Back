@@ -4,12 +4,12 @@ import (
 	"backend/internal/model"
 )
 
-type GoodTransform struct {}
-type UserTransform struct {}
-type CommentTransform struct {}
+type GoodTransform struct{}
+type UserTransform struct{}
+type CommentTransform struct{}
 
-func (gt *GoodTransform) GoodTransformToApiModel(dbModel model.Good) model.GetGoods {
-	return model.GetGoods{
+func (gt *GoodTransform) GoodTransformToApiModel(dbModel model.Good) model.GetGoodsResponse {
+	return model.GetGoodsResponse{
 		GoodsId:     dbModel.ID,
 		CreatedTime: dbModel.CreatedAt,
 		UpdatedTime: dbModel.UpdatedAt,
@@ -22,8 +22,8 @@ func (gt *GoodTransform) GoodTransformToApiModel(dbModel model.Good) model.GetGo
 		IsDeleted:   dbModel.IsDeleted,
 		IsBought:    dbModel.IsBought,
 		Tags:        dbModel.Tags,
-		UserId:      dbModel.UserId,
-		User:        dbModel.User,
+		//UserId:      dbModel.UserId,
+		//User:        dbModel.User,
 		Comments:    dbModel.Comments,
 	}
 }
@@ -35,6 +35,6 @@ func (gt *GoodTransform) GoodTransformToDbModel(apiModel model.PostGoodsReceive)
 		Images:      apiModel.Images,
 		Price:       apiModel.Price,
 		Tags:        apiModel.Tags,
-		UserId:      apiModel.UserId,
+		//UserId:      apiModel.UserId,
 	}
 }

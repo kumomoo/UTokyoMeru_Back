@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/internal/router"
+	_"backend/internal/db"
 	"fmt"
 	"net/http"
 
@@ -26,16 +27,9 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func main() {
-	r := gin.Default()
+	r := router.Router
 	r.Use(CORSMiddleware())
 
-	post := r.Group("/posts")
-	{
-		post.GET("", router.GetAllPosts)
-		post.GET("/:PostId", router.GetAllReplies)
-		post.POST("", router.CreatePost)
-		post.POST("/:PostId", router.CreateReply)
-	}
 
 	err := r.Run(":8000")
 	if err != nil {

@@ -3,7 +3,7 @@ package model
 import "time"
 
 // send this when frontend requests goods
-type GetGoods struct {
+type GetGoodsResponse struct {
 	GoodsId     uint
 	CreatedTime time.Time
 	UpdatedTime time.Time
@@ -21,7 +21,7 @@ type GetGoods struct {
 	Comments    []Comment
 }
 
-// receive this when frontend posts goods
+// receive this when frontend posts or updates goods
 type PostGoodsReceive struct {
 	Title       string
 	Description string
@@ -29,25 +29,24 @@ type PostGoodsReceive struct {
 	Price       float64
 	Tags        []string
 	UserId      uint
+	IsInvisible bool
+	IsDeleted   bool
+	IsBought    bool
 }
 
-// send this when frontend posts goods
+// send this when frontend posts or updates goods
 type PostGoodsResponse struct {
-	Success  bool
 	Message  string
 	GoodInfo Good
 }
 
-type GetUser struct {
-	Name        string
-	MailAddress string
-	Password    string
-	Avatar      string
-	IsDeleted   bool
-	IsBanned    bool
-	UserClass   string
-	Gender      string
-	PhoneNumber string
-	MailCode    string
-	Address     string
+// receive this when frontend deletes goods
+type DeleteGoodsReceive struct {
+	ID     uint
+	UserId uint
+}
+
+// send this when frontend deletes goods
+type DeleteGoodsResponse struct {
+	Message string
 }

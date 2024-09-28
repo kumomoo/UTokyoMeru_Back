@@ -5,6 +5,7 @@ import (
 	"backend/internal/model"
 	"backend/internal/utils"
 	"strconv"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,18 +15,17 @@ func GetAllGoods(c *gin.Context) {
 	gt := &utils.GoodTransform{}
 	result, err := crud.FindAllOrdered()
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Find Posts"})
+		c.JSON(500, gin.H{"error": "Cannot Find Goods"})
 		return
 	}
-	posts := make([]model.GetGoods, len(result))
+	posts := make([]model.GetGoodsResponse, len(result))
 	for i := range posts {
 		posts[i] = gt.GoodTransformToApiModel(result[i])
 	}
 	c.JSON(200, posts)
-	return
 }
 
-func GetGoodsById(c *gin.Context) {
+func GetGoodById(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	gt := &utils.GoodTransform{}
 	id, err := strconv.Atoi(c.Param("id"))
@@ -35,12 +35,11 @@ func GetGoodsById(c *gin.Context) {
 	}
 	result, err := crud.FindById(uint(id))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Find Post"})
+		c.JSON(500, gin.H{"error": "Cannot Find Good"})
 		return
 	}
 	post := gt.GoodTransformToApiModel(*result)
 	c.JSON(200, post)
-	return
 }
 
 func CreateGood(c *gin.Context) {
@@ -54,14 +53,65 @@ func CreateGood(c *gin.Context) {
 	dbGood := gt.GoodTransformToDbModel(good)
 	err := crud.CreateByObject(dbGood)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Create Post"})
+		fmt.Println(err, dbGood)
+		c.JSON(500, gin.H{"error": "Cannot Create Good"})
 		return
 	}
 	post := model.PostGoodsResponse{
-		Success: true,
-		Message: "Good Created",
+		Message:  "Good Created",
 		GoodInfo: dbGood,
 	}
 	c.JSON(200, post)
-	return
+}
+
+func UpdateGood(c *gin.Context) {
+	crud := &db.GoodsCRUD{}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	var good model.PostGoodsReceive
+	if err := c.ShouldBindJSON(&good); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid Input"})
+		return
+	}
+
+	dbGood, err := crud.FindById(uint(id))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Cannot Find Post"})
+		return
+	}
+
+	dbGood.Title = good.Title
+	dbGood.Description = good.Description
+	dbGood.Images = good.Images
+	dbGood.Price = good.Price
+	dbGood.Tags = good.Tags
+	dbGood.IsInvisible = good.IsInvisible
+	dbGood.IsDeleted = good.IsDeleted
+	dbGood.IsBought = good.IsBought
+
+	err = crud.UpdateByObject(*dbGood)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Cannot Update Post"})
+		return
+	}
+	updatedGood := model.PostGoodsResponse{
+		Message:  "Good Updated",
+		GoodInfo: *dbGood,
+	}
+	c.JSON(200, updatedGood)
+}
+
+func DeleteGood(c *gin.Context) {
+	crud := &db.GoodsCRUD{}
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Invalid ID"})
+		return
+	}
+	crud.DeleteById(uint(id))
+	c.JSON(200, gin.H{"message": "Good Deleted"})
 }
