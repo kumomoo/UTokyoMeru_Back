@@ -30,7 +30,7 @@ type User struct {
 	Avatar      string    `gorm:"type:text"`
 	Sales       []Good    `gorm:"foreignKey:SellerID"`
 	Buys        []Good    `gorm:"foreignKey:BuyerID"`
-	FavoList	[]Good	  `gorm:"many2many:user_likes"`
+	FavoList    []Good    `gorm:"many2many:user_likes"`
 	Comments    []Comment `gorm:"foreignKey:UserID"`
 	IsDeleted   bool      `gorm:"not null;default:false"`
 	IsBanned    bool      `gorm:"not null;default:false"`
@@ -39,6 +39,8 @@ type User struct {
 	PhoneNumber string    `gorm:"default:null"`
 	MailCode    string    `gorm:"default:null"`
 	Address     string    `gorm:"default:null"`
+	Rating      float32   `gorm:"default:0"`
+	RatingCount float32	  `gorm:"default:0"`
 }
 
 type Comment struct {
