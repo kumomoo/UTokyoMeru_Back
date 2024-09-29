@@ -3,8 +3,9 @@ package db
 import (
 	"backend/config"
 	"backend/internal/model"
-	"sync"
 	"fmt"
+	"log"
+	"sync"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -31,7 +32,10 @@ func init() {
 		panic(dbErr)
 	}
 
-	dbInstance.AutoMigrate(&model.User{},&model.Good{},&model.Comment{})
+	err := dbInstance.AutoMigrate(&model.User{},&model.Good{},&model.Comment{})
+	if err!=nil {
+		log.Fatal("failed to migrate database: ", err)
+	}
 
 	fmt.Println("Database initialized")
 }

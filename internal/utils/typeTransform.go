@@ -8,9 +8,9 @@ type GoodTransform struct{}
 type UserTransform struct{}
 type CommentTransform struct{}
 
-func (gt *GoodTransform) GoodTransformToApiModel(dbModel model.Good) model.GetGoodsResponse {
+func (gt *GoodTransform) Db2ResponseModel(dbModel model.Good) model.GetGoodsResponse {
 	return model.GetGoodsResponse{
-		GoodsId:     dbModel.ID,
+		GoodID:      dbModel.ID,
 		CreatedTime: dbModel.CreatedAt,
 		UpdatedTime: dbModel.UpdatedAt,
 		Title:       dbModel.Title,
@@ -22,19 +22,17 @@ func (gt *GoodTransform) GoodTransformToApiModel(dbModel model.Good) model.GetGo
 		IsDeleted:   dbModel.IsDeleted,
 		IsBought:    dbModel.IsBought,
 		Tags:        dbModel.Tags,
-		//UserId:      dbModel.UserId,
-		//User:        dbModel.User,
-		Comments:    dbModel.Comments,
+		SellerID:    dbModel.SellerID,
 	}
 }
 
-func (gt *GoodTransform) GoodTransformToDbModel(apiModel model.PostGoodsReceive) model.Good {
+func (gt *GoodTransform) Post2DbModel(apiModel model.PostGoodsReceive) model.Good {
 	return model.Good{
 		Title:       apiModel.Title,
 		Description: apiModel.Description,
 		Images:      apiModel.Images,
 		Price:       apiModel.Price,
 		Tags:        apiModel.Tags,
-		//UserId:      apiModel.UserId,
+		SellerID:    apiModel.SellerID,
 	}
 }

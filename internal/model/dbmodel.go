@@ -9,33 +9,36 @@ type Good struct {
 	gorm.Model
 	Title       string         `gorm:"not null"`
 	Description string         `gorm:"not null"`
-	Images      pq.StringArray `gorm:"not null, type:text[]"`
+	Images      pq.StringArray `gorm:"type:text[]"`
 	Price       float64        `gorm:"not null"`
 	Views       uint           `gorm:"default:0"`
-	IsInvisible bool           `gorm:"default:False"`
-	IsDeleted   bool           `gorm:"default:False"`
-	IsBought    bool           `gorm:"default:False"`
-	Tags        pq.StringArray `gorm:"not null, type:text[]"`
-	Comments    []Comment      `gorm:"foreignkey:GoodId"`
+	Likes       uint           `gorm:"default:0"`
+	IsInvisible bool           `gorm:"default:false"`
+	IsDeleted   bool           `gorm:"default:false"`
+	IsBought    bool           `gorm:"default:false"`
+	Tags        pq.StringArray `gorm:"type:text[]"`
+	SellerID    uint           `gorm:"not null"`
+	BuyerID     uint           `gorm:"default:null"`
+	Comments    []Comment      `gorm:"foreignKey:GoodID"`
 }
 
 type User struct {
 	gorm.Model
-	Name        string `gorm:"not null"`
-	MailAddress string `gorm:"unique;not null"`
-	Password    string `gorm:"not null"`
-	Avatar      string `gorm:"type:text"`
-	Sales       []Good
-	Buys        []Good
-	Favorites   []Good
-	Comments    []Comment
-	IsDeleted   bool   `gorm:"not null;default:0"`
-	IsBanned    bool   `gorm:"not null;default:0"`
-	UserClass   string `gorm:"not null;default:user"`
-	Gender      string `gorm:"not null;default:Others"`
-	PhoneNumber string `gorm:"not null;default:null"`
-	MailCode    string `gorm:"not null;default:null"`
-	Address     string `gorm:"not null;default:null"`
+	Name        string    `gorm:"not null"`
+	MailAddress string    `gorm:"unique;not null"`
+	Password    string    `gorm:"not null"`
+	Avatar      string    `gorm:"type:text"`
+	Sales       []Good    `gorm:"foreignKey:SellerID"`
+	Buys        []Good    `gorm:"foreignKey:BuyerID"`
+	FavoList	[]Good	  `gorm:"many2many:user_likes"`
+	Comments    []Comment `gorm:"foreignKey:UserID"`
+	IsDeleted   bool      `gorm:"not null;default:false"`
+	IsBanned    bool      `gorm:"not null;default:false"`
+	UserClass   string    `gorm:"not null;default:user"`
+	Gender      string    `gorm:"not null;default:Others"`
+	PhoneNumber string    `gorm:"default:null"`
+	MailCode    string    `gorm:"default:null"`
+	Address     string    `gorm:"default:null"`
 }
 
 type Comment struct {
@@ -45,8 +48,6 @@ type Comment struct {
 	ReplyTo     uint   `gorm:"default:null"`
 	IsInvisible bool   `gorm:"default:false"`
 	IsDeleted   bool   `gorm:"default:false"`
-	UserId      uint
-	GoodId      uint
-	// User        User   `gorm:"foreignKey:UserId"`
-	// Good        Good   `gorm:"foreignKey:GoodId"`
+	UserID      uint
+	GoodID      uint
 }

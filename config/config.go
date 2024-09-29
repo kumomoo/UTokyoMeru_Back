@@ -32,6 +32,6 @@ func init() {
 func (c *Config) ToDSN() string {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
 		c.DbConfig.Host, c.DbConfig.User, c.DbConfig.Password, c.DbConfig.Dbname, c.DbConfig.Port, c.DbConfig.SSLMode, c.DbConfig.Timezone)
-	fmt.Println("database config loaded:", dsn)
+	//fmt.Println("database config loaded:", dsn)
 	return dsn
 }

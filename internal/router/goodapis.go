@@ -4,8 +4,8 @@ import (
 	"backend/internal/db"
 	"backend/internal/model"
 	"backend/internal/utils"
-	"strconv"
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +20,7 @@ func GetAllGoods(c *gin.Context) {
 	}
 	posts := make([]model.GetGoodsResponse, len(result))
 	for i := range posts {
-		posts[i] = gt.GoodTransformToApiModel(result[i])
+		posts[i] = gt.Db2ResponseModel(result[i])
 	}
 	c.JSON(200, posts)
 }
@@ -38,7 +38,7 @@ func GetGoodById(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Cannot Find Good"})
 		return
 	}
-	post := gt.GoodTransformToApiModel(*result)
+	post := gt.Db2ResponseModel(*result)
 	c.JSON(200, post)
 }
 
@@ -50,7 +50,7 @@ func CreateGood(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Invalid Input"})
 		return
 	}
-	dbGood := gt.GoodTransformToDbModel(good)
+	dbGood := gt.Post2DbModel(good)
 	err := crud.CreateByObject(dbGood)
 	if err != nil {
 		fmt.Println(err, dbGood)
