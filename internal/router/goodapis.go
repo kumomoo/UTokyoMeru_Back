@@ -13,6 +13,7 @@ import (
 func GetAllGoods(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	gt := &utils.GoodTransform{}
+	usercrud := &db.UsersCRUD{}
 	result, err := crud.FindAllOrdered()
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Cannot Find Goods"})
@@ -20,15 +21,24 @@ func GetAllGoods(c *gin.Context) {
 	}
 	posts := make([]model.GetGoodsResponse, len(result))
 	for i := range posts {
-		posts[i] = gt.Db2ResponseModel(result[i])
+		theUser, err := usercrud.FindById(result[i].SellerID)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Cannot Find User"})
+			return
+		}
+		posts[i] = gt.FindGoodsByIdDb2ResponseModel(result[i], *theUser)
 	}
 	c.JSON(200, posts)
 }
 
 func GetGoodById(c *gin.Context) {
+	// 数据库的CRUD
 	crud := &db.GoodsCRUD{}
+	// 数据转换
 	gt := &utils.GoodTransform{}
+
 	id, err := strconv.Atoi(c.Param("id"))
+
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Invalid ID"})
 		return
@@ -38,7 +48,14 @@ func GetGoodById(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Cannot Find Good"})
 		return
 	}
-	post := gt.Db2ResponseModel(*result)
+	usercrud := &db.UsersCRUD{}
+	theUser, err := usercrud.FindById(result.SellerID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Cannot Find User"})
+		return
+	}
+	post := gt.FindGoodsByIdDb2ResponseModel(*result, *theUser)
+
 	c.JSON(200, post)
 }
 
