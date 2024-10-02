@@ -1,23 +1,17 @@
 package model
 
-import "time"
-
 // send this when frontend requests goods
 type GetGoodsResponse struct {
 	GoodID      uint
-	CreatedTime time.Time
-	UpdatedTime time.Time
 	Title       string
-	Description string
 	Images      []string
 	Price       float64
-	Views       uint
-	Likes       uint
-	IsInvisible bool
-	IsDeleted   bool
-	IsBought    bool
-	Tags        []string
-	SellerID    uint
+	Description string
+	User        UserForGetGoodsResponse
+}
+type UserForGetGoodsResponse struct {
+	Name   string
+	Avatar string
 }
 
 // receive this when frontend posts or updates goods
