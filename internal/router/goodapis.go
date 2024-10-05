@@ -16,14 +16,14 @@ func GetAllGoods(c *gin.Context) {
 	usercrud := &db.UsersCRUD{}
 	result, err := crud.FindAllOrdered()
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Find Goods"})
+		c.JSON(500, gin.H{"message": "Cannot Find Goods", "error": err})
 		return
 	}
 	posts := make([]model.GetGoodsResponse, len(result))
 	for i := range posts {
 		theUser, err := usercrud.FindById(result[i].SellerID)
 		if err != nil {
-			c.JSON(500, gin.H{"error": "Cannot Find User"})
+			c.JSON(500, gin.H{"message": "Cannot Find User", "error": err})
 			return
 		}
 		posts[i] = gt.FindGoodsByIdDb2ResponseModel(result[i], *theUser)
@@ -40,18 +40,18 @@ func GetGoodById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Invalid ID"})
+		c.JSON(500, gin.H{"message": "Invalid ID", "error": err})
 		return
 	}
 	result, err := crud.FindById(uint(id))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Find Good"})
+		c.JSON(500, gin.H{"message": "Cannot Find Good", "error": err})
 		return
 	}
 	usercrud := &db.UsersCRUD{}
 	theUser, err := usercrud.FindById(result.SellerID)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Find User"})
+		c.JSON(500, gin.H{"message": "Cannot Find User", "error": err})
 		return
 	}
 	post := gt.FindGoodsByIdDb2ResponseModel(*result, *theUser)
@@ -71,7 +71,7 @@ func CreateGood(c *gin.Context) {
 	err := crud.CreateByObject(dbGood)
 	if err != nil {
 		fmt.Println(err, dbGood)
-		c.JSON(500, gin.H{"error": "Cannot Create Good"})
+		c.JSON(500, gin.H{"message": "Cannot Create Good", "error": err})
 		return
 	}
 	post := model.PostGoodsResponse{
@@ -85,19 +85,19 @@ func UpdateGood(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Invalid ID"})
+		c.JSON(500, gin.H{"message": "Invalid ID", "error": err})
 		return
 	}
 
 	var good model.PostGoodsReceive
 	if err := c.ShouldBindJSON(&good); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid Input"})
+		c.JSON(400, gin.H{"message": "Invalid Input", "error": err})
 		return
 	}
 
 	dbGood, err := crud.FindById(uint(id))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Find Post"})
+		c.JSON(500, gin.H{"message": "Cannot Find Good", "error": err})
 		return
 	}
 
@@ -112,7 +112,7 @@ func UpdateGood(c *gin.Context) {
 
 	err = crud.UpdateByObject(*dbGood)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Cannot Update Post"})
+		c.JSON(500, gin.H{"message": "Cannot Update Good", "error": err})
 		return
 	}
 	updatedGood := model.PostGoodsResponse{
@@ -126,7 +126,7 @@ func DeleteGood(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Invalid ID"})
+		c.JSON(500, gin.H{"message": "Invalid ID", "error": err})
 		return
 	}
 	crud.DeleteById(uint(id))
