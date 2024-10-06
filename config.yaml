@@ -1,7 +1,7 @@
 dbConfig:
-  host: localhost
+  host: postgres
   port: "5432"
-  user: huyunfan
+  user: postgres
   password: yamanashi@412907
   dbname: postgres
   sslmode: disable

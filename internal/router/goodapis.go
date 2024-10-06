@@ -5,6 +5,7 @@ import (
 	"backend/internal/model"
 	"backend/internal/utils"
 	"fmt"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -14,21 +15,63 @@ func GetAllGoods(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	gt := &utils.GoodTransform{}
 	usercrud := &db.UsersCRUD{}
+
+	// 获取请求参数
+	pageNumStr := c.Query("PageNum")
+	itemNumStr := c.Query("ItemNum")
+
+	// 检查参数是否存在
+	var useLimit bool
+	var limit int
+	if pageNumStr != "" && itemNumStr != "" {
+		// 转换参数为整数
+		pageNum, err := strconv.Atoi(pageNumStr)
+		if err != nil || pageNum < 1 {
+			pageNum = 1 // 如果参数无效，设置默认页码为1
+		}
+
+		itemNum, err := strconv.Atoi(itemNumStr)
+		if err != nil || itemNum < 1 {
+			itemNum = 10 // 如果参数无效，设置每页默认数量为10
+		}
+
+		// 计算需要获取的商品数量
+		limit = pageNum * itemNum
+		useLimit = true
+	}
+
+	// 查找所有商品并按顺序排列
 	result, err := crud.FindAllOrdered()
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Cannot Find Goods", "error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot Find Goods", "error": err})
 		return
 	}
-	posts := make([]model.GetGoodsResponse, len(result))
-	for i := range posts {
-		theUser, err := usercrud.FindById(result[i].SellerID)
+
+	// 处理需要获取的商品数量
+	var limitedResult []model.Good
+	if useLimit {
+		// 确保 limit 不超过商品总数
+		if limit > len(result) {
+			limit = len(result)
+		}
+		limitedResult = result[:limit]
+	} else {
+		// 如果没有分页参数，返回所有商品
+		limitedResult = result
+	}
+
+	// 构建响应
+	posts := make([]model.GetGoodsResponse, len(limitedResult))
+	for i := range limitedResult {
+		theUser, err := usercrud.FindById(limitedResult[i].SellerID)
 		if err != nil {
-			c.JSON(500, gin.H{"message": "Cannot Find User", "error": err})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot Find User", "error": err})
 			return
 		}
-		posts[i] = gt.FindGoodsByIdDb2ResponseModel(result[i], *theUser)
+		posts[i] = gt.FindGoodsByIdDb2ResponseModel(limitedResult[i], *theUser)
 	}
-	c.JSON(200, posts)
+
+	c.JSON(http.StatusOK, posts)
 }
 
 func GetGoodById(c *gin.Context) {
