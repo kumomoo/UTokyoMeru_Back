@@ -40,7 +40,8 @@ type User struct {
 	MailCode    string    `gorm:"default:null"`
 	Address     string    `gorm:"default:null"`
 	Rating      float32   `gorm:"default:0"`
-	RatingCount float32	  `gorm:"default:0"`
+	RatingCount float32   `gorm:"default:0"`
+	Token       string
 }
 
 type Comment struct {
