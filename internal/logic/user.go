@@ -6,10 +6,10 @@ import (
 	"backend/internal/pkg/jwt"
 )
 
-func SignUp(p *model.ParamSignup) (err error) {
+func SignUp(p *model.ParamSignup) (user *model.User, err error) {
 	crud := &db.UsersCRUD{}
 	//构造一个user实例
-	user := &model.User{
+	user = &model.User{
 		Name:        p.Username,
 		MailAddress: p.MailAddress,
 		Password:    p.Password,
@@ -18,7 +18,15 @@ func SignUp(p *model.ParamSignup) (err error) {
 		Address:     p.Address.PostalCode + p.Address.Prefecture + p.Address.City + p.Address.AddressDetail,
 	}
 	//3.保存进数据库
-	return crud.CreateByObject(*user)
+	if err := crud.CreateByObject(*user); err != nil {
+		return nil, err
+	}
+	token, err := jwt.GenToken(user.MailAddress, user.Name)
+	if err != nil {
+		return
+	}
+	user.Token = token
+	return
 }
 
 func Login(p *model.ParamLogin) (user *model.User, err error) {

@@ -1,6 +1,10 @@
 package model
 
 // 定义请求的参数结构体
+
+type ParamVerify struct {
+	MailAddress string `json:"mail_address" binding:"required,email"`
+}
 type ParamSignup struct {
 	Username         string  `json:"user_name" binding:"required"`
 	MailAddress      string  `json:"mail_address" binding:"required,email"`

@@ -3,10 +3,9 @@ package utils
 import (
 	"fmt"
 	"math/rand"
-	"net/smtp"
 	"time"
 
-	"github.com/jordan-wright/email"
+	"gopkg.in/gomail.v2"
 )
 
 // GenerateRandomCode 生成指定长度的随机验证码
@@ -21,18 +20,21 @@ func GenerateRandomCode(length int) string {
 }
 
 // SendVerificationEmail 发送验证邮件
-func SendVerificationEmail(to, code string) error {
-	e := email.NewEmail()
-	e.From = "yamanashiluna@gmail.com"
-	e.To = []string{to}
-	e.Subject = "邮箱验证码"
-	e.Text = []byte(fmt.Sprintf("您的验证码是：%s", code))
+func SendEmail(to string, code string) error {
+	// SMTP服务器配置
+	host := "smtp.qq.com"           // 替换为您的SMTP服务器地址
+	port := 465                     // SMTP服务器端口
+	username := "1677575560@qq.com" // 发件人邮箱
+	password := "msuqmezhglhbebch"  // 发件人邮箱密码
 
-	// 配置SMTP服务器信息
-	smtpHost := "smtp.example.com"
-	smtpPort := 587
-	smtpUsername := "your-username"
-	smtpPassword := "your-password"
+	m := gomail.NewMessage()
+	m.SetHeader("From", username)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", "验证码")
+	m.SetBody("text/plain", fmt.Sprintf("您的验证码是：%s", code))
 
-	return e.Send(fmt.Sprintf("%s:%d", smtpHost, smtpPort), smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost))
+	d := gomail.NewDialer(host, port, username, password)
+	d.SSL = true
+
+	return d.DialAndSend(m)
 }

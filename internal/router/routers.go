@@ -11,18 +11,18 @@ var Router = gin.Default()
 
 func init() {
 
-	v1 := Router.Group("/v1")
+	Router.POST("/signup", SignUpHandler)
+	Router.POST("/verification", VerificationHandler)
+	Router.POST("/login", LoginHandler)
 
-	v1.POST("/signup", SignUpHandler)
-	v1.POST("/login", LoginHandler)
-
-	v1.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
+	goods := Router.Group("/goods")
+	goods.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
 	{
-		v1.GET("/goods/", GetAllGoods)
-		v1.POST("/goods/", CreateGood)
-		v1.GET("/goods/:id", GetGoodById)
-		v1.PUT("/goods/:id", UpdateGood)
-		v1.DELETE("/goods/:id", DeleteGood)
+		goods.GET("/", GetAllGoods)
+		goods.POST("/", CreateGood)
+		goods.GET("/:id", GetGoodById)
+		goods.PUT("/:id", UpdateGood)
+		goods.DELETE("/:id", DeleteGood)
 	}
 
 	Router.NoRoute(func(c *gin.Context) {
