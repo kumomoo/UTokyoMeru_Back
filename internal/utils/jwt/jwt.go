@@ -7,7 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const TokenExpireDuration = time.Hour * 8760
+const TokenExpireDuration = time.Hour * 168
 
 var mySecret = []byte("mambaout")
 

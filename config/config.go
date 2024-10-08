@@ -8,7 +8,8 @@ import (
 )
 
 type Config struct {
-	DbConfig DbConfig
+	DbConfig    DbConfig
+	RedisConfig RedisConfig
 }
 
 type DbConfig struct {
@@ -19,6 +20,14 @@ type DbConfig struct {
 	Dbname   string `json:"dbname"`
 	SSLMode  string `json:"sslmode"`
 	Timezone string `json:"timezone"`
+}
+
+type RedisConfig struct {
+	Host      string `json:"host"`
+	Port      int64  `json:"port"`
+	Password  string `json:"password"`
+	Db        int    `json:"db"`
+	Pool_size int    `json:"pool_size"`
 }
 
 var C Config

@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "backend/internal/db"
 	"backend/internal/router"
-	_"backend/internal/db"
 	"fmt"
 	"net/http"
 
@@ -29,7 +29,6 @@ func CORSMiddleware() gin.HandlerFunc {
 func main() {
 	r := router.Router
 	r.Use(CORSMiddleware())
-
 
 	err := r.Run(":8000")
 	if err != nil {
