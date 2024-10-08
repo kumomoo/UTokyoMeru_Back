@@ -3,7 +3,7 @@ package logic
 import (
 	"backend/internal/db"
 	"backend/internal/model"
-	"backend/internal/pkg/jwt"
+	"backend/internal/utils/jwt"
 )
 
 func SignUp(p *model.ParamSignup) (user *model.User, err error) {
