@@ -46,3 +46,32 @@ func Login(p *model.ParamLogin) (user *model.User, err error) {
 	user.Token = token
 	return
 }
+
+func LoginByCode(p *model.ParamLoginByCode) (user *model.User, err error) {
+	crud := &db.UsersCRUD{}
+	user = &model.User{
+		MailAddress: p.MailAddress,
+	}
+	if err := crud.LoginByCode(user); err != nil {
+		return nil, err
+	}
+	//生成jwt
+	token, err := jwt.GenToken(user.MailAddress, user.Name)
+	if err != nil {
+		return
+	}
+	user.Token = token
+	return
+}
+
+func ResetPassword(p *model.ParamResetPassword) (err error) {
+	crud := &db.UsersCRUD{}
+	user := &model.User{
+		MailAddress: p.MailAddress,
+		Password:    p.Password,
+	}
+	if err := crud.ResetPassword(*user); err != nil {
+		return err
+	}
+	return
+}

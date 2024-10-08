@@ -12,8 +12,11 @@ var Router = gin.Default()
 func init() {
 
 	Router.POST("/signup", SignUpHandler)
-	Router.POST("/verification", VerificationHandler)
-	Router.POST("/login", LoginHandler)
+	Router.POST("/signup/verification", VerificationHandler)
+	Router.POST("/login/verification", VerificationHandler)
+	Router.POST("/login/password", LoginHandler)
+	Router.POST("/login/code", LoginByCodeHandler)
+	Router.POST("/login/resetpassword", ResetPasswordHandler)
 
 	goods := Router.Group("/goods")
 	goods.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
