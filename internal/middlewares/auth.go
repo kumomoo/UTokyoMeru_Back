@@ -5,7 +5,7 @@ import (
 	"strings"
 	"backend/internal/db"
 	"strconv"
-	
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -59,7 +59,7 @@ func AdminAuthMiddleware() func(c *gin.Context) {
 			c.JSON(404, gin.H{"message": "Admin not exist", "error": err})
 			return
 		}
-		if user.UserClass != "admin" {
+		if user.UserClass == "admin" {
 			c.Next()
 		} else {
 			c.JSON(403, gin.H{"message": "Unauthorized"})
