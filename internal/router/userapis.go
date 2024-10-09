@@ -98,7 +98,7 @@ func LoginHandler(c *gin.Context) {
 	user, err := logic.Login(&p)
 	if err != nil {
 		if errors.Is(err, errors.New("user not exist")) {
-			c.JSON(400, gin.H{"message": "User not exist", "error": err})
+			c.JSON(404, gin.H{"message": "User not exist", "error": err})
 			return
 		}
 		c.JSON(500, gin.H{"message": "Invalid password", "error": err})
@@ -171,23 +171,23 @@ func ResetPasswordHandler(c *gin.Context) {
 	// 从Redis获取存储的验证码并比对获取的验证码
 	storedCode, err := db.GetVerificationCode(p.MailAddress + "reset")
 	if err == redis.Nil {
-		c.JSON(400, gin.H{"message": "Verificationcode expired or not exist.", })
+		c.JSON(404, gin.H{"message": "Verificationcode expired or not exist.", "error": err})
 		return
 	} else if err != nil {
-		c.JSON(500, gin.H{"error": "getting verificationcode failed"})
+		c.JSON(500, gin.H{"message": "Failed to get verification code", "error": err})
 		return
 	}
 
 	// 验证码比对
 	if p.VerificationCode != storedCode {
-		c.JSON(400, gin.H{"message": "VerificationCode error"})
+		c.JSON(400, gin.H{"message": "VerificationCode error", "error": errors.New("VerificationCode error")})
 		return
 	}
 
 	//业务处理
 	if err := logic.ResetPassword(&p); err != nil {
 		if errors.Is(err, errors.New("user not exist")) {
-			c.JSON(400, gin.H{"message": "User not exist", "error": err})
+			c.JSON(404, gin.H{"message": "User not exist", "error": err})
 			return
 		}
 		c.JSON(400, gin.H{"message": "Invalid password", "error": err})
@@ -195,5 +195,5 @@ func ResetPasswordHandler(c *gin.Context) {
 	}
 
 	//3.返回响应
-	c.JSON(200, gin.H{"error": "reset password success"})
+	c.JSON(200, gin.H{"message": "reset password"})
 }

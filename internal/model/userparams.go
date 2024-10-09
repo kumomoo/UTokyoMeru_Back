@@ -15,10 +15,10 @@ type ParamSignup struct {
 	MailAddress          string  `json:"mail_address" binding:"required,email"`
 	VerificationCode     string  `json:"verification_code" binding:"required"`
 	Password             string  `json:"password" binding:"required"`
-	Gender               string  `json:"gender" binding:"required,oneof=0 1 2 3"`
-	Birthday             time.Time `json:"birthday"`
-	PhoneNumber          string  `json:"phone_number"`
-	Address              Address `json:"address"`
+	Gender               string  `json:"gender,omitempty" binding:"required,oneof=0 1 2 3"`
+	Birthday             time.Time `json:"birthday,omitempty"`
+	PhoneNumber          string  `json:"phone_number,omitempty"`
+	Address              Address `json:"address,omitempty"`
 	VerificationCodeType string  `json:"verification_code_type" binding:"required"`
 }
 

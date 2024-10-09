@@ -11,7 +11,6 @@ var Router = gin.Default()
 func init() {
 
 	Router.POST("/signup", SignUpHandler)
-	Router.POST("/signup/verification", VerificationHandler)
 	Router.POST("/login/verification", VerificationHandler)
 	Router.POST("/login/password", LoginHandler)
 	Router.POST("/login/code", LoginByCodeHandler)
@@ -33,7 +32,7 @@ func init() {
 
 	Router.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{
-			"message": "API not foundg",
+			"message": "API not found",
 		})
 	})
 }
