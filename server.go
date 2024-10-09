@@ -30,7 +30,7 @@ func main() {
 	r := router.Router
 	r.Use(CORSMiddleware())
 
-	err := r.Run(":8000")
+	err := r.Run(":8100")
 	if err != nil {
 		fmt.Println(err)
 	}

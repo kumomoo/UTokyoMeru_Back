@@ -18,6 +18,7 @@ func VerificationHandler(c *gin.Context) {
 	var p model.ParamVerify
 	if err := c.ShouldBindJSON(&p); err != nil {
 		//请求参数有误
+		fmt.Println(err)
 		c.JSON(400, gin.H{"message": "Invalid param", "error": err})
 		return
 	}
@@ -125,16 +126,16 @@ func LoginByCodeHandler(c *gin.Context) {
 	// 从Redis获取存储的验证码并比对获取的验证码
 	storedCode, err := db.GetVerificationCode(p.MailAddress + p.VerificationCodeType)
 	if err == redis.Nil {
-		c.JSON(400, gin.H{"error": "Verificationcode expired or not exist."})
+		c.JSON(400, gin.H{"message": "Verificationcode expired or not exist.", "error": err})
 		return
 	} else if err != nil {
-		c.JSON(500, gin.H{"error": "getting verificationcode failed"})
+		c.JSON(500, gin.H{"message": "Failed to get verification code", "error": err})
 		return
 	}
 
 	// 验证码比对
 	if p.VerificationCode != storedCode {
-		c.JSON(400, gin.H{"error": "VerificationCode error"})
+		c.JSON(400, gin.H{"message": "Verification code error", "error": "VerificationCode error"})
 		return
 	}
 
@@ -170,7 +171,7 @@ func ResetPasswordHandler(c *gin.Context) {
 	// 从Redis获取存储的验证码并比对获取的验证码
 	storedCode, err := db.GetVerificationCode(p.MailAddress + "reset")
 	if err == redis.Nil {
-		c.JSON(400, gin.H{"error": "Verificationcode expired or not exist."})
+		c.JSON(400, gin.H{"message": "Verificationcode expired or not exist.", })
 		return
 	} else if err != nil {
 		c.JSON(500, gin.H{"error": "getting verificationcode failed"})
@@ -179,7 +180,7 @@ func ResetPasswordHandler(c *gin.Context) {
 
 	// 验证码比对
 	if p.VerificationCode != storedCode {
-		c.JSON(400, gin.H{"error": "VerificationCode error"})
+		c.JSON(400, gin.H{"message": "VerificationCode error"})
 		return
 	}
 

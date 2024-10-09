@@ -2,12 +2,12 @@ package model
 
 // send this when frontend requests goods
 type GetGoodsResponse struct {
-	GoodID      uint
-	Title       string
-	Images      []string
-	Price       float64
-	Description string
-	User        UserForGetGoodsResponse
+	GoodID      uint                    `json:"good_id"`
+	Title       string                  `json:"title"`
+	Images      []string                `json:"images"`
+	Price       float64                 `json:"price"`
+	Description string                  `json:"description"`
+	User        UserForGetGoodsResponse `json:"user"`
 }
 type UserForGetGoodsResponse struct {
 	Name   string
@@ -21,10 +21,10 @@ type PostGoodsReceive struct {
 	Images      []string
 	Price       float64
 	Tags        []string
-	SellerID    uint
-	IsInvisible bool
-	IsDeleted   bool
-	IsBought    bool
+	SellerID    uint    `json:"seller_id"`
+	IsInvisible bool    `json:"is_invisible"`
+	IsDeleted   bool    `json:"is_deleted"`
+	IsBought    bool    `json:"is_bought"`
 }
 
 // send this when frontend posts or updates goods
@@ -36,7 +36,7 @@ type PostGoodsResponse struct {
 // receive this when frontend deletes goods
 type DeleteGoodsReceive struct {
 	ID       uint
-	SellerID uint
+	SellerID uint `json:"seller_id"`
 }
 
 // send this when frontend deletes goods

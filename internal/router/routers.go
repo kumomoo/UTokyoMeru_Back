@@ -2,7 +2,6 @@ package router
 
 import (
 	"backend/internal/middlewares"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,21 +15,25 @@ func init() {
 	Router.POST("/login/verification", VerificationHandler)
 	Router.POST("/login/password", LoginHandler)
 	Router.POST("/login/code", LoginByCodeHandler)
-	Router.POST("/login/resetpassword", ResetPasswordHandler)
+	Router.POST("/login/reset", ResetPasswordHandler)
 
-	goods := Router.Group("/goods")
-	goods.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
+	goodsAuth := Router.Group("/goods")
+	goodsAuth.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
 	{
-		goods.GET("/", GetAllGoods)
-		goods.POST("/", CreateGood)
-		goods.GET("/:id", GetGoodById)
-		goods.PUT("/:id", UpdateGood)
-		goods.DELETE("/:id", DeleteGood)
+		goodsAuth.POST("/", CreateGood)
+		goodsAuth.GET("/:id", GetGoodById)
+		goodsAuth.PUT("/:id", UpdateGood)
+		goodsAuth.DELETE("/:id", DeleteGood)
+	}
+
+	goodsUnauth := Router.Group("/goods")
+	{
+		goodsUnauth.GET("/", GetAllGoods)
 	}
 
 	Router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "404",
+		c.JSON(404, gin.H{
+			"message": "API not foundg",
 		})
 	})
 }

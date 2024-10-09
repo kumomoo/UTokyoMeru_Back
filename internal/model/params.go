@@ -1,5 +1,9 @@
 package model
 
+import (
+	"time"
+)
+
 // 定义请求的参数结构体
 
 type ParamVerify struct {
@@ -12,7 +16,7 @@ type ParamSignup struct {
 	VerificationCode     string  `json:"verification_code" binding:"required"`
 	Password             string  `json:"password" binding:"required"`
 	Gender               string  `json:"gender" binding:"required,oneof=0 1 2 3"`
-	Birthday             *string `json:"birthday"`
+	Birthday             time.Time `json:"birthday"`
 	PhoneNumber          string  `json:"phone_number"`
 	Address              Address `json:"address"`
 	VerificationCodeType string  `json:"verification_code_type" binding:"required"`
