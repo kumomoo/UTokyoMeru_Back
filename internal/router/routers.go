@@ -35,8 +35,9 @@ func init() {
 	{
 		admin.GET("/users", GetAllUsersHandler)
 		admin.GET("/users/:id", GetUserInfoByIdHandler)
-		admin.POST("/users/ban", BanUserHandler)
-		admin.POST("/users/unban", UnbanUserHandler)
+		admin.PUT("/users/ban", BanUserHandler)
+		admin.PUT("/users/unban", UnbanUserHandler)
+		admin.PUT("/users/", UpdateUserHandler)
 	}
 
 	Router.NoRoute(func(c *gin.Context) {
