@@ -21,7 +21,6 @@ func init() {
 	goodsAuth.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
 	{
 		goodsAuth.POST("/", CreateGood)
-		goodsAuth.GET("/:id", GetGoodById)
 		goodsAuth.PUT("/:id", UpdateGood)
 		goodsAuth.DELETE("/:id", DeleteGood)
 	}
@@ -29,6 +28,7 @@ func init() {
 	goodsUnauth := Router.Group("/goods")
 	{
 		goodsUnauth.GET("/", GetAllGoods)
+		goodsUnauth.GET("/:id", GetGoodById)
 	}
 
 	Router.NoRoute(func(c *gin.Context) {
