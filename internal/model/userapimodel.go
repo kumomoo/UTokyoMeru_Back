@@ -45,3 +45,14 @@ type ParamResetPassword struct {
 	VerificationCode string `json:"verification_code" binding:"required"`
 	Password         string `json:"password" binding:"required"`
 }
+
+type UserInfoResponse struct {
+	ID uint `json:"id"`
+	UserName string `json:"user_name"`
+	MailAddress string `json:"mail_address"`
+	Gender string `json:"gender"`
+	Birthday time.Time `json:"birthday"`
+	PhoneNumber string `json:"phone_number"`
+	Address Address `json:"address"`
+	Token string `json:"token"`
+}
