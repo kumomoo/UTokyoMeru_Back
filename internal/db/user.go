@@ -157,6 +157,8 @@ func (crud UsersCRUD) AddFavorite(userID uint, goodID uint) error {
     if err := db.First(&good, goodID).Error; err != nil {
         return err
     }
+	good.Likes++
+	db.Save(&good)
 
     return db.Model(&user).Association("FavoList").Append(&good)
 }
@@ -176,6 +178,8 @@ func (crud UsersCRUD) RemoveFavorite(userID uint, goodID uint) error {
     if err := db.First(&good, goodID).Error; err != nil {
         return err
     }
+	good.Likes--
+	db.Save(&good)
 
     return db.Model(&user).Association("FavoList").Delete(&good)
 }
