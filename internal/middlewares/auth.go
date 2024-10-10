@@ -3,6 +3,8 @@ package middlewares
 import (
 	"backend/internal/utils/jwt"
 	"strings"
+	"backend/internal/db"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,5 +41,29 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		// 将当前请求的username信息保存到请求的上下文c上
 		c.Set(ContextUserIDKey, mc.MailAddress)
 		c.Next() // 后续的处理函数可以用过c.Get(ContextUserIDKey)来获取当前请求的用户信息
+	}
+}
+
+
+func AdminAuthMiddleware() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		userID := c.Request.Header.Get("id")
+		idUint, err := strconv.ParseUint(userID, 10, 64)
+		if err != nil {
+			c.JSON(400, gin.H{"message": "Invalid param, Admin ID(number) is required", "error": err})
+			return
+		}
+		crud := db.UsersCRUD{}
+		user, err := crud.FindById(uint(idUint))
+		if err != nil {
+			c.JSON(404, gin.H{"message": "Admin not exist", "error": err})
+			return
+		}
+		if user.UserClass == "admin" {
+			c.Next()
+		} else {
+			c.JSON(403, gin.H{"message": "Unauthorized"})
+			c.Abort()
+		}
 	}
 }

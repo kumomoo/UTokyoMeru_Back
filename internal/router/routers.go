@@ -30,6 +30,16 @@ func init() {
 		goodsUnauth.GET("/:id", GetGoodById)
 	}
 
+	admin := Router.Group("/admin")
+	admin.Use(middlewares.AdminAuthMiddleware())
+	{
+		admin.GET("/users", GetAllUsersHandler)
+		admin.GET("/users/:id", GetUserInfoByIdHandler)
+		admin.PUT("/users/ban", BanUserHandler)
+		admin.PUT("/users/unban", UnbanUserHandler)
+		admin.PUT("/users/", UpdateUserHandler)
+	}
+
 	Router.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{
 			"message": "API not found",

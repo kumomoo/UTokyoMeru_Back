@@ -15,7 +15,7 @@ func SignUp(p *model.ParamSignup) (user *model.User, err error) {
 		Password:    p.Password,
 		Gender:      p.Gender,
 		PhoneNumber: p.PhoneNumber,
-		Address:     p.Address.PostalCode + p.Address.Prefecture + p.Address.City + p.Address.AddressDetail,
+		Address:     p.Address.PostalCode + " " + p.Address.Prefecture + " " + p.Address.City + " " + p.Address.AddressDetail,
 	}
 	//3.保存进数据库
 	if err := crud.CreateByObject(*user); err != nil {

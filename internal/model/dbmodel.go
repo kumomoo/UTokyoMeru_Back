@@ -1,6 +1,8 @@
 package model
 
 import (
+	"time"
+
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
@@ -36,6 +38,7 @@ type User struct {
 	IsBanned    bool      `gorm:"not null;default:false"`
 	UserClass   string    `gorm:"not null;default:user"`
 	Gender      string    `gorm:"not null;default:Others"`
+	Birthday    time.Time `gorm:"default:null"`
 	PhoneNumber string    `gorm:"default:null"`
 	MailCode    string    `gorm:"default:null"`
 	Address     string    `gorm:"default:null"`
