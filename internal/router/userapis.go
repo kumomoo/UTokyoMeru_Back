@@ -126,6 +126,7 @@ func LoginHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
+		Token: 		 user.Token,	
 	}
 	
 	if len(address) == 4 {
@@ -186,6 +187,7 @@ func LoginByCodeHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
+		Token: 		 user.Token,	
 	}
 	
 	if len(address) == 4 {
