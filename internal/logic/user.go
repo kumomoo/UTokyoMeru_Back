@@ -49,7 +49,7 @@ func Login(p *model.ParamLogin) (user *model.User, err error) {
 
 func LoginByCode(p *model.ParamLoginByCode) (user *model.User, err error) {
 	crud := &db.UsersCRUD{}
-	user, err = crud.FindUserByUniqueField("mail_address", p.MailAddress)
+	user, err = crud.FindOneByUniqueField("mail_address", p.MailAddress)
 	if err != nil {
 		return nil, err
 	}

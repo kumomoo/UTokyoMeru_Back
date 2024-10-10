@@ -4,7 +4,6 @@ import (
 	"backend/internal/utils/jwt"
 	"strings"
 	"backend/internal/db"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,14 +46,21 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 
 func AdminAuthMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		userID := c.Request.Header.Get("id")
-		idUint, err := strconv.ParseUint(userID, 10, 64)
+		authHeader := c.Request.Header.Get("Authorization")
+		parts := strings.SplitN(authHeader, " ", 2)
+		if !(len(parts) == 2 && parts[0] == "Bearer") {
+			c.JSON(403, gin.H{"message": "Invalid token"})
+			c.Abort()
+			return
+		}
+		mc, err := jwt.ParseToken(parts[1])
 		if err != nil {
-			c.JSON(400, gin.H{"message": "Invalid param, Admin ID(number) is required", "error": err})
+			c.JSON(403, gin.H{"message": "Invalid token"})
+			c.Abort()
 			return
 		}
 		crud := db.UsersCRUD{}
-		user, err := crud.FindById(uint(idUint))
+		user, err := crud.FindOneByUniqueField("mail_address", mc.MailAddress)
 		if err != nil {
 			c.JSON(404, gin.H{"message": "Admin not exist", "error": err})
 			return

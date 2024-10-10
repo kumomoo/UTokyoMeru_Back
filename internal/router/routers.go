@@ -30,6 +30,7 @@ func init() {
 	{
 		goodsUnauth.GET("/", GetAllGoods)
 		goodsUnauth.GET("/:id", GetGoodById)
+		goodsUnauth.GET("/search", SearchGoodsHandler)
 	}
 
 	admin := Router.Group("/admin")

@@ -41,7 +41,7 @@ func GetAllGoods(c *gin.Context) {
 	}
 
 	// 查找所有商品并按顺序排列
-	result, err := crud.FindAllOrdered()
+	result, err := crud.FindAllOrdered("updated_at", db.OrderDesc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot Find Goods", "error": err})
 		return
@@ -214,4 +214,27 @@ func UnLikeGoodHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"message": "Good Unliked"})
+}
+
+func SearchGoodsHandler(c *gin.Context) {
+	crud := &db.GoodsCRUD{}
+	gt := &utils.GoodTransform{}
+	keyword := c.Query("keyword")
+	orderBy := c.Query("orderBy")
+	order := c.Query("order")
+
+	goods, err := crud.Search(
+		db.WithKeyword(keyword),
+		db.WithOrderBy(orderBy),
+		db.WithOrder(order),
+	)
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Cannot Search Good", "error": err})
+		return
+	}
+	response := make([]model.GetGoodsResponse, len(goods))
+	for i := range goods {
+		response[i] = gt.FindGoodsByIdDb2ResponseModel(goods[i], goods[i].Seller)
+	}
+	c.JSON(200, response)
 }
