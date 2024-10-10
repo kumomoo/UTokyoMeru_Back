@@ -49,10 +49,8 @@ func Login(p *model.ParamLogin) (user *model.User, err error) {
 
 func LoginByCode(p *model.ParamLoginByCode) (user *model.User, err error) {
 	crud := &db.UsersCRUD{}
-	user = &model.User{
-		MailAddress: p.MailAddress,
-	}
-	if err := crud.LoginByCode(user); err != nil {
+	user, err = crud.FindUserByUniqueField("mail_address", p.MailAddress)
+	if err != nil {
 		return nil, err
 	}
 	//生成jwt
@@ -61,6 +59,10 @@ func LoginByCode(p *model.ParamLoginByCode) (user *model.User, err error) {
 		return
 	}
 	user.Token = token
+	err = crud.UpdateByObject(*user)
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 

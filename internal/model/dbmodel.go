@@ -22,6 +22,7 @@ type Good struct {
 	SellerID    uint           `gorm:"not null"`
 	BuyerID     uint           `gorm:"default:null"`
 	Comments    []Comment      `gorm:"foreignKey:GoodID"`
+	FavoUsers   []User         `gorm:"many2many:user_likes"`
 }
 
 type User struct {
