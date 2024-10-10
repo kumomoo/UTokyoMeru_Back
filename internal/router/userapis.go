@@ -83,14 +83,16 @@ func SignUpHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
-		Address: model.Address{
+	}
+	
+	if len(address) == 4 {
+		response.Address = model.Address{
 			PostalCode:    address[0],
 			Prefecture:    address[1],
 			City:          address[2],
 			AddressDetail: address[3],
-		},
+		}
 	}
-
 	//返回响应
 	c.JSON(200, response)
 }
@@ -124,13 +126,15 @@ func LoginHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
-		Address: model.Address{
+	}
+	
+	if len(address) == 4 {
+		response.Address = model.Address{
 			PostalCode:    address[0],
 			Prefecture:    address[1],
 			City:          address[2],
 			AddressDetail: address[3],
-		},
-		Token: user.Token,
+		}
 	}
 
 	//返回响应
@@ -182,13 +186,15 @@ func LoginByCodeHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
-		Address: model.Address{
+	}
+	
+	if len(address) == 4 {
+		response.Address = model.Address{
 			PostalCode:    address[0],
 			Prefecture:    address[1],
 			City:          address[2],
 			AddressDetail: address[3],
-		},
-		Token: user.Token,
+		}
 	}
 
 	//返回响应
