@@ -32,6 +32,16 @@ func (crud UsersCRUD) FindAll() ([]model.User, error) {
 	return users, result.Error
 }
 
+func (crud UsersCRUD) FindAllOrdered(fieldName string, order string) ([]model.User, error) {
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return nil, err
+	}
+	var users []model.User
+	result := db.Order(fieldName + " " + order).Find(&users)
+	return users, result.Error
+}
+
 func (crud UsersCRUD) FindById(id uint) (*model.User, error) {
 	db, err := GetDatabaseInstance()
 	if err != nil {
@@ -112,14 +122,14 @@ func (crud UsersCRUD) ResetPassword(u model.User) error {
 	return nil
 }
 
-func (crud UsersCRUD) FindAllUsersByField(fieldName string, value interface{}) ([]model.User, error) {
+func (crud UsersCRUD) FindAllByField(fieldName string, value interface{}, orderBy string, order string) ([]model.User, error) {
 	db, err := GetDatabaseInstance()
 	if err != nil {
 		return nil, err
 	}
 
 	var users []model.User
-	result := db.Where(fieldName+" = ?", value).Find(&users)
+	result := db.Where(fieldName+" = ?", value).Order(orderBy+" "+order).Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -127,7 +137,7 @@ func (crud UsersCRUD) FindAllUsersByField(fieldName string, value interface{}) (
 	return users, nil
 }
 
-func (crud UsersCRUD) FindUserByUniqueField(fieldName string, value interface{}) (*model.User, error) {
+func (crud UsersCRUD) FindOneByUniqueField(fieldName string, value interface{}) (*model.User, error) {
 	db, err := GetDatabaseInstance()
 	if err != nil {
 		return nil, err
@@ -143,43 +153,43 @@ func (crud UsersCRUD) FindUserByUniqueField(fieldName string, value interface{})
 }
 
 func (crud UsersCRUD) AddFavorite(userID uint, goodID uint) error {
-    db, err := GetDatabaseInstance()
-    if err != nil {
-        return err
-    }
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return err
+	}
 
-    var user model.User
-    if err := db.First(&user, userID).Error; err != nil {
-        return err
-    }
+	var user model.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
+	}
 
-    var good model.Good
-    if err := db.First(&good, goodID).Error; err != nil {
-        return err
-    }
+	var good model.Good
+	if err := db.First(&good, goodID).Error; err != nil {
+		return err
+	}
 	good.Likes++
 	db.Save(&good)
 
-    return db.Model(&user).Association("FavoList").Append(&good)
+	return db.Model(&user).Association("FavoList").Append(&good)
 }
 
 func (crud UsersCRUD) RemoveFavorite(userID uint, goodID uint) error {
-    db, err := GetDatabaseInstance()
-    if err != nil {
-        return err
-    }
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return err
+	}
 
-    var user model.User
-    if err := db.First(&user, userID).Error; err != nil {
-        return err
-    }
+	var user model.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return err
+	}
 
-    var good model.Good
-    if err := db.First(&good, goodID).Error; err != nil {
-        return err
-    }
+	var good model.Good
+	if err := db.First(&good, goodID).Error; err != nil {
+		return err
+	}
 	good.Likes--
 	db.Save(&good)
 
-    return db.Model(&user).Association("FavoList").Delete(&good)
+	return db.Model(&user).Association("FavoList").Delete(&good)
 }

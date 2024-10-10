@@ -41,7 +41,7 @@ func GetAllGoods(c *gin.Context) {
 	}
 
 	// 查找所有商品并按顺序排列
-	result, err := crud.FindAllOrdered()
+	result, err := crud.FindAllOrdered("updated_at", db.OrderDesc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot Find Goods", "error": err})
 		return
