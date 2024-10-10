@@ -91,22 +91,6 @@ func (crud UsersCRUD) Login(user *model.User) (err error) {
 	return
 }
 
-func (crud UsersCRUD) LoginByCode(user *model.User) (err error) {
-	db, err := GetDatabaseInstance()
-	if err != nil {
-		return err
-	}
-
-	err = db.Where("mail_address = ?", user.MailAddress).First(user).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("user not exist")
-		}
-		return err // 查询数据库时出错
-	}
-	return
-}
-
 func (crud UsersCRUD) ResetPassword(u model.User) error {
 	// 获取数据库实例
 	db, err := GetDatabaseInstance()
@@ -126,4 +110,72 @@ func (crud UsersCRUD) ResetPassword(u model.User) error {
 	}
 
 	return nil
+}
+
+func (crud UsersCRUD) FindAllUsersByField(fieldName string, value interface{}) ([]model.User, error) {
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return nil, err
+	}
+
+	var users []model.User
+	result := db.Where(fieldName+" = ?", value).Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return users, nil
+}
+
+func (crud UsersCRUD) FindUserByUniqueField(fieldName string, value interface{}) (*model.User, error) {
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return nil, err
+	}
+
+	var user model.User
+	result := db.Where(fieldName+" = ?", value).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
+}
+
+func (crud UsersCRUD) AddFavorite(userID uint, goodID uint) error {
+    db, err := GetDatabaseInstance()
+    if err != nil {
+        return err
+    }
+
+    var user model.User
+    if err := db.First(&user, userID).Error; err != nil {
+        return err
+    }
+
+    var good model.Good
+    if err := db.First(&good, goodID).Error; err != nil {
+        return err
+    }
+
+    return db.Model(&user).Association("FavoList").Append(&good)
+}
+
+func (crud UsersCRUD) RemoveFavorite(userID uint, goodID uint) error {
+    db, err := GetDatabaseInstance()
+    if err != nil {
+        return err
+    }
+
+    var user model.User
+    if err := db.First(&user, userID).Error; err != nil {
+        return err
+    }
+
+    var good model.Good
+    if err := db.First(&good, goodID).Error; err != nil {
+        return err
+    }
+
+    return db.Model(&user).Association("FavoList").Delete(&good)
 }

@@ -102,7 +102,7 @@ func GetGoodById(c *gin.Context) {
 	c.JSON(200, post)
 }
 
-func CreateGood(c *gin.Context) {
+func CreateGoodHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	gt := &utils.GoodTransform{}
 	var good model.PostGoodsReceive
@@ -124,7 +124,7 @@ func CreateGood(c *gin.Context) {
 	c.JSON(200, post)
 }
 
-func UpdateGood(c *gin.Context) {
+func UpdateGoodHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -165,7 +165,7 @@ func UpdateGood(c *gin.Context) {
 	c.JSON(200, updatedGood)
 }
 
-func DeleteGood(c *gin.Context) {
+func DeleteGoodHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -174,4 +174,43 @@ func DeleteGood(c *gin.Context) {
 	}
 	crud.DeleteById(uint(id))
 	c.JSON(200, gin.H{"message": "Good Deleted"})
+}
+
+func LikeGoodHandler(c *gin.Context) {
+	u := &db.UsersCRUD{}
+	uid, err := strconv.Atoi(c.Query("userID"))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Invalid user ID", "error": err})
+		return
+	}
+	gid, err := strconv.Atoi(c.Query("goodID"))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Invalid good ID", "error": err})
+		return
+	}
+	err = u.AddFavorite(uint(uid), uint(gid))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Cannot Like Good", "error": err})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Good Liked"})
+}
+
+func UnLikeGoodHandler(c *gin.Context) {
+	u := &db.UsersCRUD{}
+	uid, err := strconv.Atoi(c.Query("userID"))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Invalid user ID", "error": err})
+		return
+	}
+	gid, err := strconv.Atoi(c.Query("goodID"))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Invalid good ID", "error": err})
+		return
+	}
+	err = u.RemoveFavorite(uint(uid), uint(gid))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Cannot UnLike Good", "error": err})
+		return
+	}
 }
