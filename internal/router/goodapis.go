@@ -218,6 +218,7 @@ func UnLikeGoodHandler(c *gin.Context) {
 
 func SearchGoodsHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
+	gt := &utils.GoodTransform{}
 	keyword := c.Query("keyword")
 	orderBy := c.Query("orderBy")
 	order := c.Query("order")
@@ -231,5 +232,9 @@ func SearchGoodsHandler(c *gin.Context) {
 		c.JSON(500, gin.H{"message": "Cannot Search Good", "error": err})
 		return
 	}
-	c.JSON(200, goods)
+	response := make([]model.GetGoodsResponse, len(goods))
+	for i := range goods {
+		response[i] = gt.FindGoodsByIdDb2ResponseModel(goods[i], goods[i].Seller)
+	}
+	c.JSON(200, response)
 }

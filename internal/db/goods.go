@@ -114,9 +114,11 @@ func (crud GoodsCRUD) Search(ops ...searchOption) ([]model.Good, error) {
 	var goods []model.Good
 	var result *gorm.DB
 	if params.OrderBy != "" && params.Order != "" {
-		result = db.Where("title LIKE ? OR description LIKE ? OR tags LIKE ?", "%"+params.Keyword+"%", "%"+params.Keyword+"%", "%"+params.Keyword+"%").Order(params.OrderBy+" "+params.Order).Find(&goods)
+		result = db.Preload("Seller").Where("title LIKE ? OR description LIKE ? AND is_deleted = false AND is_bought = false AND is_invisible = false",
+			 "%"+params.Keyword+"%", "%"+params.Keyword+"%").Order(params.OrderBy+" "+params.Order).Find(&goods).Preload("Seller")
 	}else {
-		result = db.Where("title LIKE ? OR description LIKE ? OR tags LIKE ?", "%"+params.Keyword+"%", "%"+params.Keyword+"%", "%"+params.Keyword+"%").Find(&goods)
+		result = db.Preload("Seller").Where("title LIKE ? OR description LIKE ? AND is_deleted = false AND is_bought = false AND is_invisible = false",
+		 	"%"+params.Keyword+"%", "%"+params.Keyword+"%").Find(&goods)
 	}
 	return goods, result.Error
 }
