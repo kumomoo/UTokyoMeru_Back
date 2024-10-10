@@ -213,4 +213,5 @@ func UnLikeGoodHandler(c *gin.Context) {
 		c.JSON(500, gin.H{"message": "Cannot UnLike Good", "error": err})
 		return
 	}
+	c.JSON(200, gin.H{"message": "Good Unliked"})
 }
