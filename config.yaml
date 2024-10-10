@@ -1,6 +1,6 @@
 dbConfig:
   host: localhost
-  port: "5433"
+  port: "5432"
   user: postgres
   password: yamanashi@412907
   dbname: postgres
