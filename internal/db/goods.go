@@ -2,6 +2,9 @@ package db
 
 import(
 	"backend/internal/model"
+	"gorm.io/gorm"
+
+	"errors"
 )
 
 type GoodsCRUD struct{}
@@ -95,13 +98,25 @@ func (crud GoodsCRUD) FindOneByUniqueField(fieldName string, value interface{}) 
 	return &good, nil
 }
 
-func (crud GoodsCRUD) Search(keyword string, orderBy string, order string) ([]model.Good, error) {
+func (crud GoodsCRUD) Search(ops ...searchOption) ([]model.Good, error) {
+	params := &SearchParams{}
+	for _, op := range ops {
+		op.f(params)
+	}
+	if params.Keyword == "" {
+		return nil, errors.New("keyword is required")
+	}
 	db, err := GetDatabaseInstance()
 	if err != nil {
 		return nil, err
 	}
 
 	var goods []model.Good
-	result := db.Where("title LIKE ? OR description LIKE ? OR tags LIKE ?", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").Order(orderBy+" "+order).Find(&goods)
+	var result *gorm.DB
+	if params.OrderBy != "" && params.Order != "" {
+		result = db.Where("title LIKE ? OR description LIKE ? OR tags LIKE ?", "%"+params.Keyword+"%", "%"+params.Keyword+"%", "%"+params.Keyword+"%").Order(params.OrderBy+" "+params.Order).Find(&goods)
+	}else {
+		result = db.Where("title LIKE ? OR description LIKE ? OR tags LIKE ?", "%"+params.Keyword+"%", "%"+params.Keyword+"%", "%"+params.Keyword+"%").Find(&goods)
+	}
 	return goods, result.Error
 }

@@ -9,7 +9,7 @@ type CRUD [T any] interface  {
 	DeleteById(id uint) error
 	FindAllByField(fieldName string, value interface{}, orderBy string, order string) ([]T, error)
 	FindOneByUniqueField(fieldName string, value interface{}) (*T, error)
-	Search(keyword string, orderBy string, order string) ([]T, error)
+	Search(ops ...searchOption) ([]T, error)
 }
 
 const (
@@ -20,18 +20,34 @@ const (
 //用于Search方法的参数
 type SearchParams struct {
 	Keyword string
-	Value interface{}
 	OrderBy string
 	Order string
 }
 
-func NewSearchParams(keyword string, value interface{}, orderBy string, order string) *SearchParams {
-	return &SearchParams{
-		Keyword: keyword,
-		Value: value,
-		OrderBy: orderBy,
-		Order: order,
+type searchOption struct {
+	f func(*SearchParams)
+}
+
+func WithKeyword(keyword string) searchOption {
+	return searchOption{
+		f: func(params *SearchParams) {
+			params.Keyword = keyword
+		},
 	}
 }
 
+func WithOrderBy(orderBy string) searchOption {
+	return searchOption{
+		f: func(params *SearchParams) {
+			params.OrderBy = orderBy
+		},
+	}
+}
 
+func WithOrder(order string) searchOption {
+	return searchOption{
+		f: func(params *SearchParams) {
+			params.Order = order
+		},
+	}
+}

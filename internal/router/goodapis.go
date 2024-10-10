@@ -215,3 +215,21 @@ func UnLikeGoodHandler(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"message": "Good Unliked"})
 }
+
+func SearchGoodsHandler(c *gin.Context) {
+	crud := &db.GoodsCRUD{}
+	keyword := c.Query("keyword")
+	orderBy := c.Query("orderBy")
+	order := c.Query("order")
+
+	goods, err := crud.Search(
+		db.WithKeyword(keyword),
+		db.WithOrderBy(orderBy),
+		db.WithOrder(order),
+	)
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Cannot Search Good", "error": err})
+		return
+	}
+	c.JSON(200, goods)
+}
