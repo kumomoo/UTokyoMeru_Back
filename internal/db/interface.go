@@ -16,3 +16,22 @@ const (
 	OrderAsc = "ASC"
 	OrderDesc = "DESC"
 )
+
+//用于Search方法的参数
+type SearchParams struct {
+	Keyword string
+	Value interface{}
+	OrderBy string
+	Order string
+}
+
+func NewSearchParams(keyword string, value interface{}, orderBy string, order string) *SearchParams {
+	return &SearchParams{
+		Keyword: keyword,
+		Value: value,
+		OrderBy: orderBy,
+		Order: order,
+	}
+}
+
+

@@ -20,7 +20,7 @@ func (crud GoodsCRUD) FindAll() ([]model.Good, error) {
 		return nil, err
 	}
 	var goods []model.Good
-	result := db.Preload("User").Preload("Comments").Find(&goods)
+	result := db.Preload("User").Find(&goods)
 	return goods, result.Error
 }
 
