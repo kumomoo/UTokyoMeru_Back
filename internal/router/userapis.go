@@ -5,11 +5,11 @@ import (
 	"backend/internal/logic"
 	"backend/internal/model"
 	"backend/internal/utils"
+	mw "backend/internal/middlewares"
 	"errors"
 	"fmt"
 	"strings"
-	"strconv"
-
+	
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 )
@@ -248,12 +248,15 @@ func GetAllLikedGoodsHandler(c *gin.Context) {
 	crud := db.UsersCRUD{}
 	gt := utils.GoodTransform{}
 	//获取用户ID
-	uid, err := strconv.Atoi(c.Query("user_id"))
+	mailAddressInterface, _ := c.Get(mw.ContextUserIDKey)
+	mailAddress, _ := mailAddressInterface.(string)
+
+	user, err := crud.FindOneByUniqueField("mail_address", mailAddress)
 	if err != nil {
-		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
+		c.JSON(400, gin.H{"message": "User not exist", "error": err})
 		return
 	}
-	goods, err := crud.FindAllLikedGoods(uint(uid))
+	goods, err := crud.FindAllLikedGoods(user.ID)
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Failed to get all liked goods", "error": err})
 		return
