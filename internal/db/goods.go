@@ -9,12 +9,16 @@ import(
 
 type GoodsCRUD struct{}
 
-func (crud GoodsCRUD) CreateByObject(g model.Good) error {
+func (crud GoodsCRUD) CreateByObject(g *model.Good) (uint, error) {
 	db, err := GetDatabaseInstance()
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return db.Create(&g).Error
+	err = db.Create(&g).Error
+	if err != nil {
+		return 0, err
+	}
+	return g.ID, nil
 }
 
 func (crud GoodsCRUD) FindAll() ([]model.Good, error) {

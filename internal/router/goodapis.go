@@ -111,15 +111,20 @@ func CreateGoodHandler(c *gin.Context) {
 		return
 	}
 	dbGood := gt.Post2DbModel(good)
-	err := crud.CreateByObject(dbGood)
+	id, err := crud.CreateByObject(&dbGood)
 	if err != nil {
 		fmt.Println(err, dbGood)
 		c.JSON(500, gin.H{"message": "Cannot Create Good", "error": err})
 		return
 	}
+	res, err := crud.FindById(id)
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Database Error", "error": err})
+		return
+	}
 	post := model.PostGoodsResponse{
 		Message:  "Good Created",
-		GoodInfo: dbGood,
+		GoodInfo: *res,
 	}
 	c.JSON(200, post)
 }
