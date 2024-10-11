@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -241,4 +242,27 @@ func ResetPasswordHandler(c *gin.Context) {
 
 	//3.返回响应
 	c.JSON(200, gin.H{"message": "reset password"})
+}
+
+func GetAllLikedGoodsHandler(c *gin.Context) {
+	crud := db.UsersCRUD{}
+	gt := utils.GoodTransform{}
+	//获取用户ID
+	uid, err := strconv.Atoi(c.Query("user_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
+		return
+	}
+	goods, err := crud.FindAllLikedGoods(uint(uid))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Failed to get all liked goods", "error": err})
+		return
+	}
+
+	response := []model.GetGoodsResponse{}
+	for _, good := range goods {
+		response = append(response, gt.FindGoodsByIdDb2ResponseModel(good, good.Seller))
+	}
+
+	c.JSON(200, response)
 }
