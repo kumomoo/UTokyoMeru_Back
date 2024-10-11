@@ -43,6 +43,8 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 	}
 }
 
+
+
 func AdminAuthMiddleware() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
@@ -54,7 +56,7 @@ func AdminAuthMiddleware() func(c *gin.Context) {
 		}
 		mc, err := jwt.ParseToken(parts[1])
 		if err != nil {
-			c.JSON(403, gin.H{"message": "Invalid token"})
+			c.JSON(401, gin.H{"message": "Token expired"})
 			c.Abort()
 			return
 		}
@@ -67,7 +69,7 @@ func AdminAuthMiddleware() func(c *gin.Context) {
 		if user.UserClass == "admin" {
 			c.Next()
 		} else {
-			c.JSON(403, gin.H{"message": "Unauthorized"})
+			c.JSON(403, gin.H{"message": "Need user role: admin"})
 			c.Abort()
 		}
 	}
