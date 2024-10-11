@@ -48,5 +48,5 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	if token.Valid { // 校验token
 		return mc, nil
 	}
-	return nil, errors.New("invalid token")
+	return nil, errors.New("token expired")
 }
