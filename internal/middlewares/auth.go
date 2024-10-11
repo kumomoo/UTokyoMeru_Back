@@ -3,7 +3,6 @@ package middlewares
 import (
 	"backend/internal/db"
 	"backend/internal/utils/jwt"
-	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
