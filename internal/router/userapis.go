@@ -5,10 +5,11 @@ import (
 	"backend/internal/logic"
 	"backend/internal/model"
 	"backend/internal/utils"
+	mw "backend/internal/middlewares"
 	"errors"
 	"fmt"
 	"strings"
-
+	
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 )
@@ -241,4 +242,30 @@ func ResetPasswordHandler(c *gin.Context) {
 
 	//3.返回响应
 	c.JSON(200, gin.H{"message": "reset password"})
+}
+
+func GetAllLikedGoodsHandler(c *gin.Context) {
+	crud := db.UsersCRUD{}
+	gt := utils.GoodTransform{}
+	//获取用户ID
+	mailAddressInterface, _ := c.Get(mw.ContextUserIDKey)
+	mailAddress, _ := mailAddressInterface.(string)
+
+	user, err := crud.FindOneByUniqueField("mail_address", mailAddress)
+	if err != nil {
+		c.JSON(400, gin.H{"message": "User not exist", "error": err})
+		return
+	}
+	goods, err := crud.FindAllLikedGoods(user.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Failed to get all liked goods", "error": err})
+		return
+	}
+
+	response := []model.GetGoodsResponse{}
+	for _, good := range goods {
+		response = append(response, gt.FindGoodsByIdDb2ResponseModel(good, good.Seller))
+	}
+
+	c.JSON(200, response)
 }

@@ -193,3 +193,17 @@ func (crud UsersCRUD) RemoveFavorite(userID uint, goodID uint) error {
 
 	return db.Model(&user).Association("FavoList").Delete(&good)
 }
+
+func (crud UsersCRUD) FindAllLikedGoods(userID uint) ([]model.Good, error) {
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return nil, err
+	}
+
+	var user model.User
+	if err := db.Preload("FavoList.Seller").First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	return user.FavoList, nil
+}

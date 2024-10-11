@@ -11,10 +11,13 @@ var Router = gin.Default()
 func init() {
 
 	Router.POST("/signup", SignUpHandler)
-	Router.POST("/login/verification", VerificationHandler)
-	Router.POST("/login/password", LoginHandler)
-	Router.POST("/login/code", LoginByCodeHandler)
-	Router.POST("/login/reset", ResetPasswordHandler)
+	loginUnauth := Router.Group("/login")
+	{
+		loginUnauth.POST("/verification", VerificationHandler)
+		loginUnauth.POST("/password", LoginHandler)
+		loginUnauth.POST("/code", LoginByCodeHandler)
+		loginUnauth.POST("/reset", ResetPasswordHandler)
+	}
 
 	goodsAuth := Router.Group("/goods")
 	goodsAuth.Use(middlewares.JWTAuthMiddleware()) //应用JWT认证中间件
@@ -31,6 +34,12 @@ func init() {
 		goodsUnauth.GET("/", GetAllGoods)
 		goodsUnauth.GET("/:id", GetGoodById)
 		goodsUnauth.GET("/search", SearchGoodsHandler)
+	}
+
+	userAuth := Router.Group("/user")
+	userAuth.Use(middlewares.JWTAuthMiddleware())
+	{
+		userAuth.GET("/favolist", GetAllLikedGoodsHandler)
 	}
 
 	admin := Router.Group("/admin")
