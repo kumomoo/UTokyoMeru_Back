@@ -180,12 +180,12 @@ func LikeGoodHandler(c *gin.Context) {
 	u := &db.UsersCRUD{}
 	uid, err := strconv.Atoi(c.Query("userID"))
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Invalid user ID", "error": err})
+		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
 	gid, err := strconv.Atoi(c.Query("goodID"))
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Invalid good ID", "error": err})
+		c.JSON(400, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
 	}
 	err = u.AddFavorite(uint(uid), uint(gid))
@@ -200,12 +200,12 @@ func UnLikeGoodHandler(c *gin.Context) {
 	u := &db.UsersCRUD{}
 	uid, err := strconv.Atoi(c.Query("userID"))
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Invalid user ID", "error": err})
+		c.JSON(500, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
 	gid, err := strconv.Atoi(c.Query("goodID"))
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Invalid good ID", "error": err})
+		c.JSON(500, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
 	}
 	err = u.RemoveFavorite(uint(uid), uint(gid))

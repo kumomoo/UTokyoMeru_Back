@@ -22,7 +22,7 @@ func init() {
 		goodsAuth.POST("/", CreateGoodHandler)
 		goodsAuth.PUT("/:id", UpdateGoodHandler)
 		goodsAuth.DELETE("/:id", DeleteGoodHandler)
-		goodsAuth.POST("/like", LikeGoodHandler)
+		goodsAuth.PATCH("/like", LikeGoodHandler)
 		goodsAuth.DELETE("/like", UnLikeGoodHandler)
 	}
 
