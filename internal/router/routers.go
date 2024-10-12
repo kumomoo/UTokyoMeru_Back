@@ -40,6 +40,7 @@ func init() {
 	userAuth.Use(middlewares.JWTAuthMiddleware())
 	{
 		userAuth.GET("/favolist", GetAllLikedGoodsHandler)
+		userAuth.GET("/sales", GetAllSalesGoodsHandler)
 	}
 
 	admin := Router.Group("/admin")

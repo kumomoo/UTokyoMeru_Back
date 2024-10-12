@@ -3,13 +3,14 @@ package router
 import (
 	"backend/internal/db"
 	"backend/internal/logic"
+	mw "backend/internal/middlewares"
 	"backend/internal/model"
 	"backend/internal/utils"
-	mw "backend/internal/middlewares"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
-	
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 )
@@ -85,7 +86,7 @@ func SignUpHandler(c *gin.Context) {
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
 	}
-	
+
 	if len(address) == 4 {
 		response.Address = model.Address{
 			PostalCode:    address[0],
@@ -127,9 +128,9 @@ func LoginHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
-		Token: 		 user.Token,	
+		Token:       user.Token,
 	}
-	
+
 	if len(address) == 4 {
 		response.Address = model.Address{
 			PostalCode:    address[0],
@@ -188,9 +189,9 @@ func LoginByCodeHandler(c *gin.Context) {
 		Gender:      user.Gender,
 		Birthday:    user.Birthday,
 		PhoneNumber: user.PhoneNumber,
-		Token: 		 user.Token,	
+		Token:       user.Token,
 	}
-	
+
 	if len(address) == 4 {
 		response.Address = model.Address{
 			PostalCode:    address[0],
@@ -262,6 +263,28 @@ func GetAllLikedGoodsHandler(c *gin.Context) {
 		return
 	}
 
+	response := []model.GetGoodsResponse{}
+	for _, good := range goods {
+		response = append(response, gt.FindGoodsByIdDb2ResponseModel(good, good.Seller))
+	}
+
+	c.JSON(200, response)
+}
+
+func GetAllSalesGoodsHandler(c *gin.Context) {
+	crud := db.UsersCRUD{}
+	gt := utils.GoodTransform{}
+	//获取用户ID
+	userID, err := strconv.ParseUint(c.Query("userID"), 10, 32)
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Failed to get params", "error": err})
+		return
+	}
+	goods, err := crud.FindAllSalesGoods(uint(userID))
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Failed to get all sales goods", "error": err})
+		return
+	}
 	response := []model.GetGoodsResponse{}
 	for _, good := range goods {
 		response = append(response, gt.FindGoodsByIdDb2ResponseModel(good, good.Seller))
