@@ -275,7 +275,7 @@ func GetAllSalesGoodsHandler(c *gin.Context) {
 	crud := db.UsersCRUD{}
 	gt := utils.GoodTransform{}
 	//获取用户ID
-	userID, err := strconv.ParseUint(c.Query("userID"), 10, 32)
+	userID, err := strconv.ParseUint(c.Query("user_id"), 10, 32)
 	if err != nil {
 		c.JSON(400, gin.H{"message": "Failed to get params", "error": err})
 		return
@@ -291,4 +291,42 @@ func GetAllSalesGoodsHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, response)
+}
+
+func GetAllUserDataHandler(c *gin.Context) {
+	crud := db.UsersCRUD{}
+	//获取用户ID
+	mailAddressInterface, _ := c.Get(mw.ContextUserIDKey)
+	mailAddress, _ := mailAddressInterface.(string)
+
+	user, err := crud.FindOneByUniqueField("mail_address", mailAddress)
+	if err != nil {
+		c.JSON(400, gin.H{"message": "User not exist", "error": err})
+		return
+	}
+	goods, err := crud.FindAllUserData(user.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"message": "Failed to get all goods", "error": err})
+		return
+	}
+
+	var lengths [4]int
+	for i := 0; i < 3; i++ {
+		lengths[i] = len(goods[i])
+	}
+
+	isBoughtCount := 0
+	for _, sale := range goods[0] {
+		if sale.IsBought {
+			isBoughtCount++
+		}
+	}
+	lengths[3] = isBoughtCount
+
+	c.JSON(200, gin.H{
+		"sale_number":  lengths[0] - lengths[3],
+		"sold_number":  lengths[3],
+		"buy_number":   lengths[1],
+		"favor_number": lengths[2],
+	})
 }
