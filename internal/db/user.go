@@ -219,5 +219,5 @@ func (crud UsersCRUD) FindAllSalesGoods(userID uint) ([]model.Good, error) {
 		return nil, err
 	}
 
-	return user.FavoList, nil
+	return user.Sales, nil
 }
