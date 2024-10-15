@@ -262,6 +262,10 @@ func BuyGoodHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "Cannot Find Good", "error": err})
 		return
 	}
+	if good.IsBought {
+		c.JSON(400, gin.H{"message": "Good has already been bought"})
+		return
+	}
 	good.IsBought = true
 	good.BuyerID = uint(uid)
 	crud.UpdateByObject(*good)
