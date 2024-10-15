@@ -183,12 +183,12 @@ func DeleteGoodHandler(c *gin.Context) {
 
 func LikeGoodHandler(c *gin.Context) {
 	u := &db.UsersCRUD{}
-	uid, err := strconv.Atoi(c.Query("userID"))
+	uid, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
 		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
-	gid, err := strconv.Atoi(c.Query("goodID"))
+	gid, err := strconv.Atoi(c.Query("good_id"))
 	if err != nil {
 		c.JSON(400, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
@@ -203,12 +203,12 @@ func LikeGoodHandler(c *gin.Context) {
 
 func UnLikeGoodHandler(c *gin.Context) {
 	u := &db.UsersCRUD{}
-	uid, err := strconv.Atoi(c.Query("userID"))
+	uid, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
-	gid, err := strconv.Atoi(c.Query("goodID"))
+	gid, err := strconv.Atoi(c.Query("good_id"))
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
@@ -242,4 +242,28 @@ func SearchGoodsHandler(c *gin.Context) {
 		response[i] = gt.FindGoodsByIdDb2ResponseModel(goods[i], goods[i].Seller)
 	}
 	c.JSON(200, response)
+}
+
+func BuyGoodHandler(c *gin.Context) {
+	crud := &db.GoodsCRUD{}
+	uid, err := strconv.Atoi(c.Query("user_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
+		return
+	}
+	gid, err := strconv.Atoi(c.Query("good_id"))
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
+		return
+	}
+	
+	good, err := crud.FindById(uint(gid))
+	if err != nil {
+		c.JSON(400, gin.H{"message": "Cannot Find Good", "error": err})
+		return
+	}
+	good.IsBought = true
+	good.BuyerID = uint(uid)
+	crud.UpdateByObject(*good)
+	c.JSON(200, gin.H{"message": "Good Bought"})
 }
