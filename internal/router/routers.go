@@ -27,6 +27,7 @@ func init() {
 		goodsAuth.DELETE("/:id", DeleteGoodHandler)
 		goodsAuth.PATCH("/like", LikeGoodHandler)
 		goodsAuth.DELETE("/like", UnLikeGoodHandler)
+		goodsAuth.POST("/buy", BuyGoodHandler)
 	}
 
 	goodsUnauth := Router.Group("/goods")
