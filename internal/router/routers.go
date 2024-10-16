@@ -27,6 +27,7 @@ func init() {
 		goodsAuth.DELETE("/:id", DeleteGoodHandler)
 		goodsAuth.PATCH("/like", LikeGoodHandler)
 		goodsAuth.DELETE("/like", UnLikeGoodHandler)
+		goodsAuth.POST("/buy", BuyGoodHandler)
 	}
 
 	goodsUnauth := Router.Group("/goods")
@@ -40,7 +41,12 @@ func init() {
 	userAuth.Use(middlewares.JWTAuthMiddleware())
 	{
 		userAuth.GET("/favolist", GetAllLikedGoodsHandler)
-		userAuth.GET("/sales", GetAllSalesGoodsHandler)
+		userAuth.GET("/data", GetAllUserDataHandler)
+	}
+
+	userUnauth := Router.Group("/user")
+	{
+		userUnauth.GET("/sales", GetAllSalesGoodsHandler)
 	}
 
 	admin := Router.Group("/admin")
