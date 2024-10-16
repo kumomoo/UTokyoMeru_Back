@@ -41,6 +41,7 @@ func init() {
 	{
 		userAuth.GET("/favolist", GetAllLikedGoodsHandler)
 		userAuth.GET("/sales", GetAllSalesGoodsHandler)
+		userAuth.GET("/data", GetAllUserDataHandler)
 	}
 
 	admin := Router.Group("/admin")

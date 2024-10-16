@@ -219,5 +219,28 @@ func (crud UsersCRUD) FindAllSalesGoods(userID uint) ([]model.Good, error) {
 		return nil, err
 	}
 
-	return user.FavoList, nil
+	return user.Sales, nil
+}
+
+func (crud UsersCRUD) FindAllUserData(userID uint) ([][]model.Good, error) {
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return nil, err
+	}
+
+	var user model.User
+	if err := db.Preload("Sales").
+		Preload("Buys").
+		Preload("FavoList").
+		First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	result := [][]model.Good{
+		user.Sales,
+		user.Buys,
+		user.FavoList,
+	}
+
+	return result, nil
 }
