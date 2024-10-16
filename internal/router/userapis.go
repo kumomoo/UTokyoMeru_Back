@@ -304,6 +304,7 @@ func GetAllUserDataHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"message": "User not exist", "error": err})
 		return
 	}
+
 	goods, err := crud.FindAllUserData(user.ID)
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Failed to get all goods", "error": err})
