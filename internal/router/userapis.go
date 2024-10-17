@@ -335,6 +335,29 @@ func GetAllBoughtGoodsHandler(c *gin.Context) {
 	c.JSON(200, response)
 }
 
+func GetAllSoldGoodsHandler(c *gin.Context) {
+	crud := db.UsersCRUD{}
+	gt := utils.GoodTransform{}
+	//获取用户ID
+	mailAddressInterface, _ := c.Get(mw.ContextUserIDKey)
+	mailAddress, _ := mailAddressInterface.(string)
+
+	user, err := crud.FindOneByUniqueField("mail_address", mailAddress)
+	if err != nil {
+		c.JSON(400, gin.H{"message": "User not exist", "error": err})
+		return
+	}
+	goods := user.Sales
+	response := []model.GetGoodsResponse{}
+	for _, good := range goods {
+		if good.IsBought {
+			response = append(response, gt.FindGoodsByIdDb2ResponseModel(good, good.Seller))
+		}
+	}
+
+	c.JSON(200, response)
+}
+
 
 func GetAllGoodsStatsHandler(c *gin.Context) {
 	crud := db.UsersCRUD{}
