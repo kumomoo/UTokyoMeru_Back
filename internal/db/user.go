@@ -144,7 +144,7 @@ func (crud UsersCRUD) FindOneByUniqueField(fieldName string, value interface{}) 
 	}
 
 	var user model.User
-	result := db.Where(fieldName+" = ?", value).First(&user)
+	result := db.Preload("Sales.Seller").Preload("Buys.Seller").Preload("FavoList.Seller").Where(fieldName+" = ?", value).First(&user)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -194,35 +194,21 @@ func (crud UsersCRUD) RemoveFavorite(userID uint, goodID uint) error {
 	return db.Model(&user).Association("FavoList").Delete(&good)
 }
 
-func (crud UsersCRUD) FindAllLikedGoods(userID uint) ([]model.Good, error) {
+func (crud UsersCRUD) FindGoodsByFK(userID uint, relation string) ([]model.Good, error) {
 	db, err := GetDatabaseInstance()
 	if err != nil {
 		return nil, err
 	}
 
 	var user model.User
-	if err := db.Preload("FavoList.Seller").First(&user, userID).Error; err != nil {
-		return nil, err
-	}
-
-	return user.FavoList, nil
-}
-
-func (crud UsersCRUD) FindAllSalesGoods(userID uint) ([]model.Good, error) {
-	db, err := GetDatabaseInstance()
-	if err != nil {
-		return nil, err
-	}
-
-	var user model.User
-	if err := db.Preload("Sales.Seller").First(&user, userID).Error; err != nil {
+	if err := db.Preload(relation+".Seller").First(&user, userID).Error; err != nil {
 		return nil, err
 	}
 
 	return user.Sales, nil
 }
 
-func (crud UsersCRUD) FindAllUserData(userID uint) ([][]model.Good, error) {
+func (crud UsersCRUD) FindAllGoodsFK(userID uint) ([][]model.Good, error) {
 	db, err := GetDatabaseInstance()
 	if err != nil {
 		return nil, err
