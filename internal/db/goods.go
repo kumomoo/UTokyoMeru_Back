@@ -2,12 +2,14 @@ package db
 
 import(
 	"backend/internal/model"
+
 	"gorm.io/gorm"
 
 	"errors"
 )
 
 type GoodsCRUD struct{}
+
 
 func (crud GoodsCRUD) CreateByObject(g *model.Good) (uint, error) {
 	db, err := GetDatabaseInstance()

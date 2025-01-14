@@ -4,14 +4,33 @@ import (
 	_ "backend/internal/db"
 	"backend/internal/middlewares"
 	"backend/internal/router"
+	"backend/internal/utils/logger"
 	"fmt"
+	"time"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
 func main() {
+	logger.InitLogger()
+	defer logger.Logger.Sync()
+
 	r := router.Router
 	r.Use(middlewares.CORSMiddleware())
+	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+			param.ClientIP,
+			param.TimeStamp.Format(time.RFC1123),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.Request.UserAgent(),
+			param.ErrorMessage,
+		)
+	}))
 
 	err := r.Run(":8100")
 	if err != nil {
