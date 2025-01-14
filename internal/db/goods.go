@@ -37,7 +37,7 @@ func (crud GoodsCRUD) FindById(id uint) (*model.Good, error) {
 		return nil, err
 	}
 	var good model.Good
-	result := db.First(&good, id)
+	result := db.Preload("FavoUsers").Preload("Seller").Preload("Buyer").Preload("Comments").First(&good, id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
