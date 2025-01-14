@@ -25,7 +25,7 @@ func InitLogger() {
 		MaxSize:    100,
 		MaxBackups: 10,
 		MaxAge:     30,
-		Compress:   true,
+		Compress:   false,
 	}
 
 	// Gin访问日志配置
@@ -55,7 +55,7 @@ func InitLogger() {
 
 	// 设置日志级别
 	atomicLevel := zap.NewAtomicLevel()
-	atomicLevel.SetLevel(zap.InfoLevel)
+	atomicLevel.SetLevel(zap.DebugLevel)
 
 	// 创建业务日志核心
 	businessCore := zapcore.NewCore(

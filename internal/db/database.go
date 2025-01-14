@@ -57,7 +57,7 @@ func init() {
             // 慢 SQL 阈值，超过这个时间的查询会被记录
             SlowThreshold: time.Second,
             // 日志级别
-            LogLevel: logger.Info,    // 记录所有 SQL
+            LogLevel: logger.Warn,    // 记录所有 SQL
             // LogLevel: logger.Warn, // 只记录慢查询和错误
             // 是否忽略 ErrRecordNotFound 错误
             IgnoreRecordNotFoundError: true,

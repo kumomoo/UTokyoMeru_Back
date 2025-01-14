@@ -16,6 +16,8 @@ func main() {
 	logger.InitLogger()
 	defer logger.Logger.Sync()
 
+	gin.SetMode(gin.DebugMode)
+
 	r := router.Router
 	r.Use(middlewares.CORSMiddleware())
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
