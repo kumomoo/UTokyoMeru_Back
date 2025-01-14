@@ -2,8 +2,8 @@ package main
 
 import (
 	_ "backend/internal/db"
-	"backend/internal/router"
 	"backend/internal/utils/logger"
+	"backend/internal/router"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -11,8 +11,6 @@ import (
 )
 
 func main() {
-	// 初始化日志
-	logger.InitLogger()
 	defer logger.Logger.Sync()
 
 	// 设置 Gin 模式

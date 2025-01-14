@@ -13,7 +13,7 @@ import (
 
 var Logger *zap.Logger
 
-func InitLogger() {
+func init() {
 	// 确保日志目录存在
 	if err := os.MkdirAll("logs", 0766); err != nil {
 		panic(err)
