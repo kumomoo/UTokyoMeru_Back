@@ -92,13 +92,16 @@ func GetGoodById(c *gin.Context) {
 		return
 	}
 	usercrud := &db.UsersCRUD{}
-	theUser, err := usercrud.FindById(result.SellerID)
+	user, err := usercrud.FindById(result.SellerID)
 	if err != nil {
 		c.JSON(500, gin.H{"message": "Cannot Find User", "error": err})
 		return
 	}
-	post := gt.FindGoodsByIdDb2ResponseModel(*result, *theUser)
+	post := gt.FindGoodsByIdDb2ResponseModel(*result, *user)
+	
 
+	// 增加点击量
+	crud.UpdateByField("Views", result.Views+1, *result)
 	c.JSON(200, post)
 }
 

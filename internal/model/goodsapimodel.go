@@ -6,6 +6,8 @@ type GetGoodsResponse struct {
 	Title       string                  `json:"title"`
 	Images      []string                `json:"images"`
 	Price       float64                 `json:"price"`
+	Views       uint                    `json:"views"`
+	Favorites   uint                    `json:"favorites"`
 	Description string                  `json:"description"`
 	User        UserForGetGoodsResponse `json:"user"`
 }

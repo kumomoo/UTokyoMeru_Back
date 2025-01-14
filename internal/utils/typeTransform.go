@@ -15,6 +15,8 @@ func (gt *GoodTransform) FindGoodsByIdDb2ResponseModel(dbModel model.Good, theUs
 		Description: dbModel.Description,
 		Images:      dbModel.Images,
 		Price:       dbModel.Price,
+		Views:       dbModel.Views,
+		Favorites:   uint(len(dbModel.FavoUsers)),
 		User: model.UserForGetGoodsResponse{
 			Name:   theUser.Name,
 			Avatar: theUser.Avatar,

@@ -37,7 +37,7 @@ func (crud GoodsCRUD) FindById(id uint) (*model.Good, error) {
 		return nil, err
 	}
 	var good model.Good
-	result := db.First(&good, id)
+	result := db.Preload("FavoUsers").Preload("Seller").Preload("Buyer").Preload("Comments").First(&good, id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -50,6 +50,31 @@ func (crud GoodsCRUD) UpdateByObject(g model.Good) error {
 		return err
 	}
 	return db.Save(&g).Error
+}
+
+func (crud GoodsCRUD) UpdateByField(fieldName string, value interface{}, g model.Good) error {
+    db, err := GetDatabaseInstance()
+    if err != nil {
+        return err
+    }
+    
+    // 使用 map 构建更新数据
+    updateData := map[string]interface{}{
+        fieldName: value,
+    }
+    
+    // 使用 Model 设置要更新的对象，然后用 Updates 更新指定字段的值
+    result := db.Model(&g).Updates(updateData)
+    if result.Error != nil {
+        return result.Error
+    }
+    
+    // 检查是否真的更新了数据
+    if result.RowsAffected == 0 {
+        return errors.New("no record updated")
+    }
+    
+    return nil
 }
 
 func (crud GoodsCRUD) DeleteById(id uint) error {
