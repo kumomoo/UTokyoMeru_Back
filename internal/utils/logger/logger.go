@@ -61,7 +61,7 @@ func InitLogger() {
 	businessCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(encoderConfig),
 		zapcore.NewMultiWriteSyncer(zapcore.AddSync(businessHook)),
-		zap.InfoLevel,
+		zap.DebugLevel,
 	)
 
 	// 创建业务日志记录器
