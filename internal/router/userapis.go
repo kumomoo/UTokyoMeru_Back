@@ -27,7 +27,7 @@ func VerificationHandler(c *gin.Context) {
 		//请求参数有误
 		logger.Logger.Error("请求参数有误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Invalid param", "error": err})
@@ -40,7 +40,7 @@ func VerificationHandler(c *gin.Context) {
 	if err != nil {
 		logger.Logger.Error("发送验证码失败",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(500, gin.H{"message": "sending code failed", "error": err})
@@ -51,7 +51,7 @@ func VerificationHandler(c *gin.Context) {
 	if err != nil {
 		logger.Logger.Error("存储验证码失败",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(500, gin.H{"message": "storaging code failed"})
@@ -60,7 +60,7 @@ func VerificationHandler(c *gin.Context) {
 
 	logger.Logger.Info("发送验证码成功",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 		zap.String("mailAddress", to),
 		zap.String("code", code),
 	)
@@ -164,13 +164,13 @@ func LoginHandler(c *gin.Context) {
 	var p model.ParamLogin
 	logger.Logger.Info("开始登录",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	if err := c.ShouldBindJSON(&p); err != nil {
 		//请求参数有误
 		logger.Logger.Error("请求参数有误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Invalid param", "error": err})
@@ -183,14 +183,14 @@ func LoginHandler(c *gin.Context) {
 		if errors.Is(err, errors.New("user not exist")) {
 			logger.Logger.Info("用户不存在",
 				zap.String("path", c.FullPath()),
-				zap.Any("params", c.Params),
+				zap.Any("body", c.Request.Body),
 			)
 			c.JSON(404, gin.H{"message": "User not exist", "error": err})
 			return
 		}
 		logger.Logger.Info("密码错误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(500, gin.H{"message": "Invalid password", "error": err})
@@ -220,7 +220,7 @@ func LoginHandler(c *gin.Context) {
 	//返回响应
 	logger.Logger.Info("登录成功",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	c.JSON(200, response)
 }
@@ -230,13 +230,13 @@ func LoginByCodeHandler(c *gin.Context) {
 	var p model.ParamLoginByCode
 	logger.Logger.Info("开始登录",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	if err := c.ShouldBindJSON(&p); err != nil {
 		//请求参数有误
 		logger.Logger.Error("请求参数有误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Invalid param", "error": err})
@@ -248,14 +248,14 @@ func LoginByCodeHandler(c *gin.Context) {
 	if err == redis.Nil {
 		logger.Logger.Info("验证码过期或不存在",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 		)
 		c.JSON(400, gin.H{"message": "Verificationcode expired or not exist.", "error": err})
 		return
 	} else if err != nil {
 		logger.Logger.Error("获取验证码失败",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(500, gin.H{"message": "Failed to get verification code", "error": err})
@@ -266,7 +266,7 @@ func LoginByCodeHandler(c *gin.Context) {
 	if p.VerificationCode != storedCode {
 		logger.Logger.Info("验证码错误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 		)
 		c.JSON(400, gin.H{"message": "Verification code error", "error": "VerificationCode error"})
 		return
@@ -278,14 +278,14 @@ func LoginByCodeHandler(c *gin.Context) {
 		if errors.Is(err, errors.New("user not exist")) {
 			logger.Logger.Info("用户不存在",
 				zap.String("path", c.FullPath()),
-				zap.Any("params", c.Params),
+				zap.Any("body", c.Request.Body),
 			)
 			c.JSON(400, gin.H{"message": "User not exist", "error": err})
 			return
 		}
 		logger.Logger.Error("无法登录",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Internal error", "error": err})
@@ -315,7 +315,7 @@ func LoginByCodeHandler(c *gin.Context) {
 	//返回响应
 	logger.Logger.Info("登录成功",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	c.JSON(200, response)
 }
@@ -325,13 +325,13 @@ func ResetPasswordHandler(c *gin.Context) {
 	var p model.ParamResetPassword
 	logger.Logger.Info("开始重置密码",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	if err := c.ShouldBindJSON(&p); err != nil {
 		//请求参数有误
 		logger.Logger.Error("请求参数有误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Invalid param", "error": err})
@@ -343,14 +343,14 @@ func ResetPasswordHandler(c *gin.Context) {
 	if err == redis.Nil {
 		logger.Logger.Info("验证码过期或不存在",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 		)
 		c.JSON(404, gin.H{"message": "Verificationcode expired or not exist.", "error": err})
 		return
 	} else if err != nil {
 		logger.Logger.Error("获取验证码失败",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(500, gin.H{"message": "Failed to get verification code", "error": err})
@@ -361,7 +361,7 @@ func ResetPasswordHandler(c *gin.Context) {
 	if p.VerificationCode != storedCode {
 		logger.Logger.Info("验证码错误",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 		)
 		c.JSON(400, gin.H{"message": "VerificationCode error", "error": errors.New("VerificationCode error")})
 		return
@@ -372,14 +372,14 @@ func ResetPasswordHandler(c *gin.Context) {
 		if errors.Is(err, errors.New("user not exist")) {
 			logger.Logger.Info("用户不存在",
 				zap.String("path", c.FullPath()),
-				zap.Any("params", c.Params),
+				zap.Any("body", c.Request.Body),
 			)
 			c.JSON(404, gin.H{"message": "User not exist", "error": err})
 			return
 		}
 		logger.Logger.Error("无法重置密码",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Invalid password", "error": err})
@@ -389,7 +389,7 @@ func ResetPasswordHandler(c *gin.Context) {
 	//3.返回响应
 	logger.Logger.Info("重置密码成功",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	c.JSON(200, gin.H{"message": "reset password"})
 }
@@ -401,13 +401,13 @@ func GetAllSalesGoodsHandler(c *gin.Context) {
 	//获取用户ID
 	logger.Logger.Error("开始获取用户所有出售商品信息",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	userID, err := strconv.ParseUint(c.Query("user_id"), 10, 32)
 	if err != nil {
 		logger.Logger.Error("无法获取用户ID",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(400, gin.H{"message": "Failed to get params", "error": err})
@@ -417,7 +417,7 @@ func GetAllSalesGoodsHandler(c *gin.Context) {
 	if err != nil {
 		logger.Logger.Error("无法获取信息",
 			zap.String("path", c.FullPath()),
-			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
 			zap.Error(err),
 		)
 		c.JSON(500, gin.H{"message": "Failed to get all sales goods", "error": err})
@@ -430,7 +430,7 @@ func GetAllSalesGoodsHandler(c *gin.Context) {
 
 	logger.Logger.Info("获取用户所有出售商品信息成功",
 		zap.String("path", c.FullPath()),
-		zap.Any("params", c.Params),
+		zap.Any("body", c.Request.Body),
 	)
 	c.JSON(200, response)
 }
