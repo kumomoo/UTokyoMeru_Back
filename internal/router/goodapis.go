@@ -146,7 +146,6 @@ func GetGoodById(c *gin.Context) {
 	logger.Logger.Debug("获取商品详情成功",
 		zap.String("path", c.FullPath()),
 		zap.Any("params", c.Params),
-		zap.Any("result", post),
 	)
 	c.JSON(200, post)
 }
