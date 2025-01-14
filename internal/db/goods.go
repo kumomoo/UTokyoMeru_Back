@@ -52,6 +52,14 @@ func (crud GoodsCRUD) UpdateByObject(g model.Good) error {
 	return db.Save(&g).Error
 }
 
+func (crud GoodsCRUD) UpdateByField(fieldName string, value interface{}, g model.Good) error {
+	db, err := GetDatabaseInstance()
+	if err != nil {
+		return err
+	}
+	return db.Model(&g).Select(fieldName).Updates(value).Error
+}
+
 func (crud GoodsCRUD) DeleteById(id uint) error {
 	obj, err:=crud.FindById(id)
 	if err != nil {

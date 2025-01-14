@@ -101,12 +101,7 @@ func GetGoodById(c *gin.Context) {
 	
 
 	// 增加点击量
-	result.Views++
-	err = crud.UpdateByObject(*result)
-	if err != nil {
-		c.JSON(500, gin.H{"message": "Cannot Update Good", "error": err})
-		return
-	}
+	crud.UpdateByField("Views", result.Views+1, *result)
 	c.JSON(200, post)
 }
 
