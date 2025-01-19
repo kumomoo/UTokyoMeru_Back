@@ -638,3 +638,46 @@ func GetAllGoodsStatsHandler(c *gin.Context) {
 		"favor_number": lengths[2],
 	})
 }
+
+func GetUserCommonInfoHandler(c *gin.Context) {
+	crud := db.UsersCRUD{}
+	id, err := strconv.ParseUint(c.Param("user_id"), 10, 32)
+	if err != nil {
+		logger.Logger.Error("无法获取用户ID, 用户ID非法",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
+		c.JSON(400, gin.H{"message": "Invalid user ID", "error": err})
+		return
+	}
+	user, err := crud.FindOneByUniqueField("id", uint(id))
+	if err != nil {
+		logger.Logger.Error("无法获取用户信息",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
+		c.JSON(500, gin.H{"message": "Failed to get user info", "error": err})
+		return
+	}
+
+	response := model.UserCommonInfoResponse{
+		ID: 		 user.ID,
+		UserName: 	 user.Name,
+		MailAddress: user.MailAddress,
+		Avatar: 	 user.Avatar,
+		UserClass: 	 user.UserClass,
+		Rating:  	 user.Rating,
+		RatingCount: user.RatingCount,
+		Bio:         user.Bio,
+		IsDeleted:   user.IsDeleted,
+		IsBanned:    user.IsBanned,
+	}
+
+	logger.Logger.Info("获取用户公共信息成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
+	c.JSON(200, response)
+}
