@@ -2,12 +2,14 @@ package db
 
 import(
 	"backend/internal/model"
+
 	"gorm.io/gorm"
 
 	"errors"
 )
 
 type GoodsCRUD struct{}
+
 
 func (crud GoodsCRUD) CreateByObject(g *model.Good) (uint, error) {
 	db, err := GetDatabaseInstance()
@@ -27,7 +29,7 @@ func (crud GoodsCRUD) FindAll() ([]model.Good, error) {
 		return nil, err
 	}
 	var goods []model.Good
-	result := db.Preload("User").Find(&goods)
+	result := db.Preload("FavoUsers").Preload("Seller").Preload("Buyer").Preload("Comments").Find(&goods)
 	return goods, result.Error
 }
 

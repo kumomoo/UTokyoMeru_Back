@@ -4,10 +4,12 @@ import (
 	"backend/internal/db"
 	"backend/internal/model"
 	"backend/internal/utils"
-	"fmt"
+	"backend/internal/utils/logger"
+	
 	"net/http"
 	"strconv"
 
+	"go.uber.org/zap"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,6 +45,11 @@ func GetAllGoods(c *gin.Context) {
 	// 查找所有商品并按顺序排列
 	result, err := crud.FindAllOrdered("updated_at", db.OrderDesc)
 	if err != nil {
+		logger.Logger.Error("无法找到商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot Find Goods", "error": err})
 		return
 	}
@@ -65,35 +72,62 @@ func GetAllGoods(c *gin.Context) {
 	for i := range limitedResult {
 		theUser, err := usercrud.FindById(limitedResult[i].SellerID)
 		if err != nil {
+			logger.Logger.Error("无法找到用户",
+				zap.String("path", c.FullPath()),
+				zap.Any("params", c.Params),
+				zap.Error(err),
+			)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Cannot Find User", "error": err})
 			return
 		}
 		posts[i] = gt.FindGoodsByIdDb2ResponseModel(limitedResult[i], *theUser)
 	}
+	logger.Logger.Debug("构建响应成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+		zap.Any("posts", posts),
+	)
 
 	c.JSON(http.StatusOK, posts)
 }
 
 func GetGoodById(c *gin.Context) {
-	// 数据库的CRUD
 	crud := &db.GoodsCRUD{}
-	// 数据转换
 	gt := &utils.GoodTransform{}
 
-	id, err := strconv.Atoi(c.Param("id"))
+	logger.Logger.Debug("开始获取商品详情",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
 
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		logger.Logger.Error("无效ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Invalid ID", "error": err})
 		return
 	}
 	result, err := crud.FindById(uint(id))
 	if err != nil {
+		logger.Logger.Error("无法找到商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Find Good", "error": err})
 		return
 	}
 	usercrud := &db.UsersCRUD{}
 	user, err := usercrud.FindById(result.SellerID)
 	if err != nil {
+		logger.Logger.Error("无法找到用户",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Find User", "error": err})
 		return
 	}
@@ -101,7 +135,18 @@ func GetGoodById(c *gin.Context) {
 	
 
 	// 增加点击量
-	crud.UpdateByField("Views", result.Views+1, *result)
+	err = crud.UpdateByField("Views", result.Views+1, *result)
+	if err != nil {
+		logger.Logger.Error("无法更新点击量",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
+	}
+	logger.Logger.Debug("获取商品详情成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
 	c.JSON(200, post)
 }
 
@@ -110,18 +155,34 @@ func CreateGoodHandler(c *gin.Context) {
 	gt := &utils.GoodTransform{}
 	var good model.PostGoodsReceive
 	if err := c.ShouldBindJSON(&good); err != nil {
+		logger.Logger.Error("无效输入",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"error": "Invalid Input"})
 		return
 	}
 	dbGood := gt.Post2DbModel(good)
 	id, err := crud.CreateByObject(&dbGood)
 	if err != nil {
-		fmt.Println(err, dbGood)
+		logger.Logger.Error("无法创建商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Any("good", good),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Create Good", "error": err})
 		return
 	}
 	res, err := crud.FindById(id)
 	if err != nil {
+		logger.Logger.Error("无法找到商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Database Error", "error": err})
 		return
 	}
@@ -129,6 +190,11 @@ func CreateGoodHandler(c *gin.Context) {
 		Message:  "Good Created",
 		GoodInfo: *res,
 	}
+	logger.Logger.Debug("创建商品成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+		zap.Any("post", post),
+	)
 	c.JSON(200, post)
 }
 
@@ -136,18 +202,34 @@ func UpdateGoodHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		logger.Logger.Error("无效ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Invalid ID", "error": err})
 		return
 	}
 
 	var good model.PostGoodsReceive
 	if err := c.ShouldBindJSON(&good); err != nil {
+		logger.Logger.Error("无效输入",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Any("body", c.Request.Body),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"message": "Invalid Input", "error": err})
 		return
 	}
 
 	dbGood, err := crud.FindById(uint(id))
 	if err != nil {
+		logger.Logger.Error("无法找到商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Find Good", "error": err})
 		return
 	}
@@ -163,6 +245,12 @@ func UpdateGoodHandler(c *gin.Context) {
 
 	err = crud.UpdateByObject(*dbGood)
 	if err != nil {
+		logger.Logger.Error("无法更新商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Any("good", dbGood),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Update Good", "error": err})
 		return
 	}
@@ -177,10 +265,19 @@ func DeleteGoodHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		logger.Logger.Error("无效ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Invalid ID", "error": err})
 		return
 	}
 	crud.DeleteById(uint(id))
+	logger.Logger.Debug("删除商品成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
 	c.JSON(200, gin.H{"message": "Good Deleted"})
 }
 
@@ -188,19 +285,38 @@ func LikeGoodHandler(c *gin.Context) {
 	u := &db.UsersCRUD{}
 	uid, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
+		logger.Logger.Error("无效用户ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
 	gid, err := strconv.Atoi(c.Query("good_id"))
 	if err != nil {
+		logger.Logger.Error("无效商品ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
 	}
 	err = u.AddFavorite(uint(uid), uint(gid))
 	if err != nil {
+		logger.Logger.Error("无法收藏",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Like Good", "error": err})
 		return
 	}
+	logger.Logger.Debug("收藏成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
 	c.JSON(200, gin.H{"message": "Good Liked"})
 }
 
@@ -208,19 +324,38 @@ func UnLikeGoodHandler(c *gin.Context) {
 	u := &db.UsersCRUD{}
 	uid, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
+		logger.Logger.Error("无效用户ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
 	gid, err := strconv.Atoi(c.Query("good_id"))
 	if err != nil {
+		logger.Logger.Error("无效商品ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
 	}
 	err = u.RemoveFavorite(uint(uid), uint(gid))
 	if err != nil {
+		logger.Logger.Error("无法取消收藏",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot UnLike Good", "error": err})
 		return
 	}
+	logger.Logger.Debug("取消收藏成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
 	c.JSON(200, gin.H{"message": "Good Unliked"})
 }
 
@@ -237,6 +372,11 @@ func SearchGoodsHandler(c *gin.Context) {
 		db.WithOrder(order),
 	)
 	if err != nil {
+		logger.Logger.Error("无法搜索商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(500, gin.H{"message": "Cannot Search Good", "error": err})
 		return
 	}
@@ -244,6 +384,11 @@ func SearchGoodsHandler(c *gin.Context) {
 	for i := range goods {
 		response[i] = gt.FindGoodsByIdDb2ResponseModel(goods[i], goods[i].Seller)
 	}
+	logger.Logger.Debug("搜索商品成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+		zap.Any("response", response),
+	)
 	c.JSON(200, response)
 }
 
@@ -251,26 +396,49 @@ func BuyGoodHandler(c *gin.Context) {
 	crud := &db.GoodsCRUD{}
 	uid, err := strconv.Atoi(c.Query("user_id"))
 	if err != nil {
+		logger.Logger.Error("无效用户ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"message": "Invalid user ID. Please enter a number", "error": err})
 		return
 	}
 	gid, err := strconv.Atoi(c.Query("good_id"))
 	if err != nil {
+		logger.Logger.Error("无效商品ID",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"message": "Invalid good ID. Please enter a number", "error": err})
 		return
 	}
 	
 	good, err := crud.FindById(uint(gid))
 	if err != nil {
+		logger.Logger.Error("无法找到商品",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+			zap.Error(err),
+		)
 		c.JSON(400, gin.H{"message": "Cannot Find Good", "error": err})
 		return
 	}
 	if good.IsBought {
+		logger.Logger.Error("商品已购买",
+			zap.String("path", c.FullPath()),
+			zap.Any("params", c.Params),
+		)
 		c.JSON(400, gin.H{"message": "Good has already been bought"})
 		return
 	}
 	good.IsBought = true
 	good.BuyerID = uint(uid)
 	crud.UpdateByObject(*good)
+	logger.Logger.Debug("购买商品成功",
+		zap.String("path", c.FullPath()),
+		zap.Any("params", c.Params),
+	)
 	c.JSON(200, gin.H{"message": "Good Bought"})
 }

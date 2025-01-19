@@ -2,14 +2,38 @@ package router
 
 import (
 	"backend/internal/middlewares"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-var Router = gin.Default()
+var Router *gin.Engine
 
 func init() {
+	// 创建路由实例
+	Router = gin.New()
 
+	// 配置全局中间件
+	Router.Use(gin.Recovery())               // 恢复中间件
+	Router.Use(middlewares.CORSMiddleware()) // CORS中间件
+
+	// 配置日志中间件
+	Router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+			param.ClientIP,
+			param.TimeStamp.Format(time.RFC1123),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.Request.UserAgent(),
+			param.ErrorMessage,
+		)
+	}))
+
+	// 路由组配置
 	Router.POST("/signup", SignUpHandler)
 	loginUnauth := Router.Group("/login")
 	{

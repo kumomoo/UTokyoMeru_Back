@@ -2,20 +2,24 @@ package main
 
 import (
 	_ "backend/internal/db"
-	"backend/internal/middlewares"
+	"backend/internal/utils/logger"
 	"backend/internal/router"
-	"fmt"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 )
 
 func main() {
-	r := router.Router
-	r.Use(middlewares.CORSMiddleware())
+	defer logger.Logger.Sync()
 
-	err := r.Run(":8100")
+	// 设置 Gin 模式
+	gin.SetMode(gin.DebugMode)
+
+	// 启动服务器
+	err := router.Router.Run(":8100")
 	if err != nil {
-		fmt.Println(err)
+		logger.Logger.Error("服务器启动失败", zap.Error(err))
 	}
 }
 
