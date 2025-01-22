@@ -56,3 +56,16 @@ type UserInfoResponse struct {
 	Address Address `json:"address"`
 	Token string `json:"token"`
 }
+
+type UserCommonInfoResponse struct {
+	ID uint `json:"id"`
+	UserName string `json:"user_name"`
+	MailAddress string `json:"mail_address"`
+	Avatar string `json:"avatar"`
+	UserClass string `json:"user_class"`
+	Rating float32 `json:"rating"`
+	RatingCount uint `json:"rating_count"`
+	Bio string `json:"bio"`
+	IsDeleted bool `json:"is_deleted"`
+	IsBanned bool `json:"is_banned"`
+}

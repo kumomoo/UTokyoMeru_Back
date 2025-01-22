@@ -68,6 +68,7 @@ func init() {
 		userAuth.GET("/data", GetAllGoodsStatsHandler)
 		userAuth.GET("/bought", GetAllBoughtGoodsHandler)
 		userAuth.GET("/sold", GetAllSoldGoodsHandler)
+		userAuth.GET("/:user_id", GetUserCommonInfoHandler)
 	}
 
 	userUnauth := Router.Group("/user")
